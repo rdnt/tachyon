@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"tachyon2/pkg/syncwriter"
+	"github.com/rdnt/tachyon/pkg/syncwriter"
 
 	"github.com/logrusorgru/aurora"
 	"github.com/mattn/go-colorable"
@@ -53,7 +53,6 @@ type Logger struct {
 }
 
 func init() {
-	// create default stdout and stderr loggers before logger init
 	stdoutWriter = syncwriter.New(colorable.NewColorable(os.Stdout))
 	stderrWriter = syncwriter.New(colorable.NewColorable(os.Stderr))
 }
@@ -63,9 +62,11 @@ func colorize(s string, c Color) string {
 }
 
 func New(name string, color Color) *Logger {
-	// name = strings.ToUpper(name)
-	name = fmt.Sprintf("[%s] ", name)
-	name = colorize(name, color)
+	if name != "" {
+		name = fmt.Sprintf("[%s] ", name)
+		name = colorize(name, color)
+	}
+
 	return &Logger{
 		name:   name,
 		stdout: log.New(stdoutWriter, "", 0),

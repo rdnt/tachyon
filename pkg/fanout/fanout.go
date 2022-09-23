@@ -1,6 +1,7 @@
 package fanout
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -13,7 +14,7 @@ func New[E any]() *Fanout[E] {
 	return &Fanout[E]{conns: []chan E{}}
 }
 
-func (f *Fanout[E]) Subscribe() chan E {
+func (f *Fanout[E]) Subscribe() (chan E, error) {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
@@ -25,10 +26,10 @@ func (f *Fanout[E]) Subscribe() chan E {
 
 	f.conns = append(f.conns, conn)
 
-	return conn
+	return conn, nil
 }
 
-func (f *Fanout[E]) Publish(event E) {
+func (f *Fanout[E]) Publish(event E) error {
 	f.lock.Lock()
 	conns := f.conns
 	f.lock.Unlock()
@@ -37,10 +38,14 @@ func (f *Fanout[E]) Publish(event E) {
 		conn <- event
 	}
 
-	return
+	return nil
 }
 
-type Exchange[E any] interface {
-	Publish(event E)
-	Subscribe() chan E
+func (f *Fanout[E]) String() string {
+	return fmt.Sprintln(len(f.conns), "connections")
+}
+
+type exchange[E any] interface {
+	Publish(event E) error
+	Subscribe() (chan E, error)
 }
