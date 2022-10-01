@@ -1,4 +1,4 @@
-package user_repository
+package project_repository
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/command/aggregate"
+	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
 )
@@ -16,55 +17,55 @@ type EventStore interface {
 }
 
 type Repo struct {
-	store   EventStore
-	mux     sync.Mutex
-	users   map[user.Id]*aggregate.User
-	dispose func()
+	store    EventStore
+	mux      sync.Mutex
+	projects map[project.Id]*aggregate.Project
+	dispose  func()
 }
 
-func (r *Repo) User(id user.Id) (user.User, error) {
+func (r *Repo) Project(id project.Id) (project.Project, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
-	u, ok := r.users[id]
+	p, ok := r.projects[id]
 	if !ok {
-		return user.User{}, command.ErrUserNotFound
+		return project.Project{}, command.ErrProjectNotFound
 	}
 
-	return u.User, nil
+	return p.Project, nil
 }
 
-func (r *Repo) UserByName(name string) (user.User, error) {
+func (r *Repo) UserProjectByName(uid user.Id, name string) (project.Project, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
-	for _, u := range r.users {
-		if u.Name == name {
-			return u.User, nil
+	for _, p := range r.projects {
+		if uid == p.OwnerId && p.Name == name {
+			return p.Project, nil
 		}
 	}
 
-	return user.User{}, command.ErrUserNotFound
+	return project.Project{}, command.ErrProjectNotFound
 }
 
 func (r *Repo) String() string {
-	return fmt.Sprint(r.users)
+	return fmt.Sprint(r.projects)
 }
 
 func (r *Repo) processEvents(events ...event.Event) {
 	r.mux.Lock()
 
 	for _, e := range events {
-		if e.AggregateType() != event.User {
+		if e.AggregateType() != event.Project {
 			continue
 		}
 
-		_, ok := r.users[user.Id(e.AggregateId())]
+		_, ok := r.projects[project.Id(e.AggregateId())]
 		if !ok {
-			r.users[user.Id(e.AggregateId())] = &aggregate.User{}
+			r.projects[project.Id(e.AggregateId())] = &aggregate.Project{}
 		}
 
-		r.users[user.Id(e.AggregateId())].ProcessEvent(e)
+		r.projects[project.Id(e.AggregateId())].ProcessEvent(e)
 	}
 
 	r.mux.Unlock()
@@ -72,8 +73,8 @@ func (r *Repo) processEvents(events ...event.Event) {
 
 func New(store EventStore) (*Repo, error) {
 	r := &Repo{
-		store: store,
-		users: map[user.Id]*aggregate.User{},
+		store:    store,
+		projects: map[project.Id]*aggregate.Project{},
 	}
 
 	events, err := store.Events()

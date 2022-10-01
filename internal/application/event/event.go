@@ -1,15 +1,17 @@
 package event
 
+import "github.com/google/uuid"
+
 type Event interface {
 	Type() Type
 	AggregateType() AggregateType
-	AggregateId() string
+	AggregateId() uuid.UUID
 }
 
 type event struct {
 	typ           Type
 	aggregateType AggregateType
-	aggregateId   string
+	aggregateId   uuid.UUID
 }
 
 func (e event) Type() Type {
@@ -20,7 +22,7 @@ func (e event) AggregateType() AggregateType {
 	return e.aggregateType
 }
 
-func (e event) AggregateId() string {
+func (e event) AggregateId() uuid.UUID {
 	return e.aggregateId
 }
 
@@ -29,7 +31,7 @@ type AggregateType string
 const (
 	Session AggregateType = "session"
 	User    AggregateType = "user"
-	//Project AggregateType = "project"
+	Project AggregateType = "project"
 )
 
 type Type string

@@ -1,9 +1,9 @@
 package event
 
 import (
+	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 )
 
 const (
@@ -17,14 +17,12 @@ type SessionCreatedEvent struct {
 	ProjectId project.Id
 	Id        session.Id
 	Name      string
-	OwnerId   user.Id
-	UserIds   []user.Id
 }
 
 func NewSessionCreatedEvent(e SessionCreatedEvent) SessionCreatedEvent {
 	e.typ = SessionCreated
 	e.aggregateType = Session
-	e.aggregateId = string(e.Id)
+	e.aggregateId = uuid.UUID(e.Id)
 
 	return e
 }

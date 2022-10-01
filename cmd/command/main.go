@@ -22,7 +22,10 @@ import (
 func main() {
 	eventStore := event_store.New()
 	sessionRepo := session_repository.New(eventStore)
-	userRepo := user_repository.New(eventStore)
+	userRepo, err := user_repository.New(eventStore)
+	if err != nil {
+		panic(err)
+	}
 	eventBus := event_bus.New(fanout.New[event.Event]())
 
 	cmds := command.New(eventStore, eventBus, sessionRepo, userRepo)

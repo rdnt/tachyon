@@ -7,9 +7,13 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/command"
+	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
+	"github.com/rdnt/tachyon/internal/application/domain/project"
+	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/internal/application/query"
 	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
@@ -23,13 +27,24 @@ func main() {
 	eventBus := event_bus.New(fanout.New[event.Event]())
 
 	eventStore := event_store.New()
-	sessionRepo := session_repository.New(eventStore)
-	userRepo := user_repository.New(eventStore)
+	sessionRepo, err := session_repository.New(eventStore)
+	if err != nil {
+		panic(err)
+	}
+	userRepo, err := user_repository.New(eventStore)
+	if err != nil {
+		panic(err)
+	}
+	projectRepo, err := project_repository.New(eventStore)
+	if err != nil {
+		panic(err)
+	}
 
 	commandSvc := command.New(
 		eventStore,
 		eventBus,
 		sessionRepo,
+		projectRepo,
 		userRepo,
 	)
 
@@ -69,17 +84,22 @@ func main() {
 				fmt.Println("sessions:", sessionView)
 				fmt.Println("users:", userView)
 			case "create user":
-				err := commandSvc.CreateUser("tasos")
+				uid := uuid.New()
+				err := commandSvc.CreateUser(user.Id(uid), "tasos")
 				if err != nil {
 					panic(err)
 				}
 
-				ru, err := userRepo.User("tasos")
+				ru, err := userRepo.User(user.Id(uid))
 				if err != nil {
 					panic(err)
 				}
-
 				fmt.Println("USER FOUND", ru)
+
+				//err = userRepo.Hydrate()
+				//if err != nil {
+				//	panic(err)
+				//}
 
 				//for i := 0; i < 1000; i++ {
 				//	u, err := querySvc.User("tasos")
@@ -92,11 +112,27 @@ func main() {
 				//	break
 				//}
 
-			case "create session":
-				err := commandSvc.CreateSession("someUserId", "someProjectId", "my-session")
+			case "create project":
+				pid := uuid.New()
+
+				fmt.Println("name?")
+				input.Scan()
+				name := input.Text()
+
+				fmt.Println("ownerId?")
+				input.Scan()
+				uid := uuid.MustParse(input.Text())
+
+				err := commandSvc.CreateProject(project.Id(pid), name, user.Id(uid))
 				if err != nil {
 					panic(err)
 				}
+
+			//case "create session":
+			//	err := commandSvc.CreateSession("someUserId", "someProjectId", "my-session")
+			//	if err != nil {
+			//		panic(err)
+			//	}
 			default:
 				fmt.Println("invalid command")
 			case "quit":

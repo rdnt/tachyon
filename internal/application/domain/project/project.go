@@ -1,17 +1,22 @@
 package project
 
-import "github.com/rdnt/tachyon/internal/application/domain/project/path"
+import (
+	"github.com/google/uuid"
+	"github.com/rdnt/tachyon/internal/application/domain/user"
+)
 
-type Id string
+type Id uuid.UUID
 
 type Project struct {
-	Id    Id
-	Paths []path.Id
+	Id      Id
+	Name    string
+	OwnerId user.Id
 }
 
-func New(id Id, paths []path.Id) Project {
+func New(id Id, ownerId user.Id, name string) Project {
 	return Project{
-		Id:    id,
-		Paths: paths,
+		Id:      id,
+		Name:    name,
+		OwnerId: ownerId,
 	}
 }

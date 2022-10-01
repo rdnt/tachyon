@@ -1,8 +1,16 @@
 package user
 
-import "fmt"
+import (
+	"fmt"
 
-type Id string
+	"github.com/google/uuid"
+)
+
+type Id uuid.UUID
+
+func (id Id) String() string {
+	return uuid.UUID(id).String()
+}
 
 type User struct {
 	Id   Id

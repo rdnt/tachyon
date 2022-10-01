@@ -10,8 +10,11 @@ require (
 
 require (
 	github.com/go-redis/redis v6.15.9+incompatible // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sanity-io/litter v1.5.5 // indirect
 	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
+	gotest.tools v2.2.0+incompatible // indirect
 )

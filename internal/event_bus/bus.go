@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/rdnt/tachyon/internal/application/event"
-	"github.com/rdnt/tachyon/internal/log"
 )
 
 type FanoutExhange[E any] interface {
@@ -17,7 +16,6 @@ type Bus struct {
 }
 
 func (b *Bus) Publish(event event.Event) error {
-	log.Debug("[cmds] send ", event)
 	return b.exchange.Publish(event)
 }
 

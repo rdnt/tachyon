@@ -1,6 +1,7 @@
 package event
 
 import (
+	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 )
 
@@ -18,7 +19,7 @@ type UserCreatedEvent struct {
 func NewUserCreatedEvent(e UserCreatedEvent) UserCreatedEvent {
 	e.typ = UserCreated
 	e.aggregateType = User
-	e.aggregateId = string(e.Id)
+	e.aggregateId = uuid.UUID(e.Id)
 
 	return e
 }

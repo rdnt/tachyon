@@ -13,8 +13,6 @@ func (s *service) handleEvent(e event.Event) error {
 			Id:        e.Id,
 			Name:      e.Name,
 			ProjectId: e.ProjectId,
-			OwnerId:   e.OwnerId,
-			UserIds:   e.UserIds,
 		})
 		if err != nil {
 			return err
