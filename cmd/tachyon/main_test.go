@@ -1,7 +1,9 @@
 package main_test
 
 import (
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/command"
@@ -12,6 +14,9 @@ import (
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/application/query"
+	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
+	"github.com/rdnt/tachyon/internal/application/query/view/user_view"
 	"github.com/rdnt/tachyon/internal/event_bus"
 	"github.com/rdnt/tachyon/internal/event_store"
 	"github.com/rdnt/tachyon/pkg/fanout"
@@ -40,14 +45,14 @@ func TestTachyon(t *testing.T) {
 		userRepo,
 	)
 
-	//sessionView := session_view.New()
-	//userView := user_view.New()
-	//
-	//querySvc := query.New(
-	//	eventBus,
-	//	sessionView,
-	//	userView,
-	//)
+	sessionView := session_view.New()
+	userView := user_view.New()
+
+	queries := query.New(
+		eventBus,
+		sessionView,
+		userView,
+	)
 
 	uid := user.Id(uuid.New())
 	t.Run("create user", func(t *testing.T) {
@@ -103,10 +108,50 @@ func TestTachyon(t *testing.T) {
 		assert.Equal(t, s.Name, name)
 		assert.Equal(t, s.ProjectId, pid)
 
+		t.Run("session can be queried", func(t *testing.T) {
+			eventually(t, func() bool {
+				s, err := queries.Session(sid)
+				if errors.Is(err, session_view.ErrSessionNotFound) {
+					return false
+				}
+				assert.NilError(t, err)
+
+				return s.Id == sid
+			})
+		})
+
 		t.Run("project can't have session with the same name", func(t *testing.T) {
 			sid := session.Id(uuid.New())
 			err := commandSvc.CreateSession(sid, name, pid)
 			assert.Assert(t, err != nil)
 		})
 	})
+}
+
+func eventually(t *testing.T, f func() bool) {
+	t.Helper()
+
+	ch := make(chan bool, 1)
+
+	timer := time.NewTimer(1 * time.Second)
+	defer timer.Stop()
+
+	ticker := time.NewTicker(1 * time.Nanosecond)
+	defer ticker.Stop()
+
+	for tick := ticker.C; ; {
+		select {
+		case <-timer.C:
+			t.Fail()
+			return
+		case <-tick:
+			tick = nil
+			go func() { ch <- f() }()
+		case v := <-ch:
+			if v {
+				return
+			}
+			tick = ticker.C
+		}
+	}
 }

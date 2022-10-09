@@ -7,6 +7,8 @@ import (
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 )
 
+var ErrSessionNotFound = errors.New("session not found")
+
 type View struct {
 	sessions map[session.Id]session.Session
 }
@@ -14,7 +16,7 @@ type View struct {
 func (v *View) Session(id session.Id) (session.Session, error) {
 	s, ok := v.sessions[id]
 	if !ok {
-		return session.Session{}, errors.New("not found")
+		return session.Session{}, ErrSessionNotFound
 	}
 
 	return s, nil
