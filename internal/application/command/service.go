@@ -43,6 +43,7 @@ type Service interface {
 	CreateProject(id project.Id, name string, ownerId user.Id) error
 	CreateSession(id session.Id, name string, projectId project.Id) error
 	JoinSession(id session.Id, uid user.Id) error
+	LeaveSession(id session.Id, uid user.Id) error
 }
 
 type service struct {

@@ -19,6 +19,7 @@ type SessionCreatedEvent struct {
 	ProjectId project.Id
 	Id        session.Id
 	Name      string
+	UserIds   []user.Id
 }
 
 func NewSessionCreatedEvent(e SessionCreatedEvent) SessionCreatedEvent {

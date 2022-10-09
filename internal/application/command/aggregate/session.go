@@ -5,6 +5,7 @@ import (
 
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"golang.org/x/exp/slices"
 )
 
 type Session struct {
@@ -17,7 +18,13 @@ func (s *Session) ProcessEvent(e event.Event) {
 		s.Id = e.Id
 		s.Name = e.Name
 		s.ProjectId = e.ProjectId
+		s.UserIds = e.UserIds
+	case event.JoinedSessionEvent:
+		s.UserIds = append(s.UserIds, e.UserId)
+	case event.LeftSessionEvent:
+		idx := slices.Index(s.UserIds, e.UserId)
+		s.UserIds = slices.Delete(s.UserIds, idx, idx+1)
 	default:
-		fmt.Println("user: unknown event", e)
+		fmt.Println("session: unknown event", e)
 	}
 }
