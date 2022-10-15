@@ -4,7 +4,6 @@ import (
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
-	"github.com/rdnt/tachyon/internal/log"
 )
 
 type EventBus interface {
@@ -13,12 +12,13 @@ type EventBus interface {
 
 type SessionView interface {
 	Session(id session.Id) (session.Session, error)
-	CreateSession(s session.Session) error
+	//CreateSession(s session.Session) error
+	//UpdateSession(s session.Session) error
 }
 
 type UserView interface {
 	User(id user.Id) (user.User, error)
-	CreateUser(u user.User) error
+	//CreateUser(u user.User) error
 }
 
 type Service interface {
@@ -47,26 +47,26 @@ func New(events EventBus, sessions SessionView, users UserView) Service {
 		events:   events,
 	}
 
-	go func() {
-		for {
-			func() {
-				events, err := s.events.Subscribe()
-				if err != nil {
-					log.Error(err)
-					return
-				}
-
-				for e := range events {
-					log.Debug("[view] recv ", e)
-					err = s.handleEvent(e)
-					if err != nil {
-						log.Error(err)
-						continue
-					}
-				}
-			}()
-		}
-	}()
+	//go func() {
+	//	for {
+	//		func() {
+	//			events, err := s.events.Subscribe()
+	//			if err != nil {
+	//				log.Error(err)
+	//				return
+	//			}
+	//
+	//			for e := range events {
+	//				log.Debug("[view] recv ", e)
+	//				err = s.handleEvent(e)
+	//				if err != nil {
+	//					log.Error(err)
+	//					continue
+	//				}
+	//			}
+	//		}()
+	//	}
+	//}()
 
 	return s
 }

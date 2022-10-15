@@ -1,12 +1,14 @@
 package main_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
 	"golang.org/x/exp/slices"
 	"gotest.tools/assert"
 )
@@ -49,27 +51,63 @@ func TestSessions(t *testing.T) {
 		err := s.commands.JoinSession(sid, uid2)
 		assert.NilError(t, err)
 
-		s, err := s.sessionRepo.Session(sid)
+		sess, err := s.sessionRepo.Session(sid)
 		assert.NilError(t, err)
 
-		assert.Assert(t, slices.Contains(s.UserIds, uid1))
-		assert.Assert(t, slices.Contains(s.UserIds, uid2))
-		assert.Equal(t, len(s.UserIds), 2)
+		assert.Assert(t, slices.Contains(sess.UserIds, uid1))
+		assert.Assert(t, slices.Contains(sess.UserIds, uid2))
+		assert.Equal(t, len(sess.UserIds), 2)
 
-		// TODO: verify queries received update
+		eventually(t, func() bool {
+			sess, err := s.queries.Session(sid)
+			if errors.Is(err, session_view.ErrSessionNotFound) {
+				return false
+			}
+			assert.NilError(t, err)
+
+			if len(sess.UserIds) != 2 {
+				return false
+			}
+
+			if !slices.Contains(sess.UserIds, uid1) {
+				return false
+			}
+
+			if !slices.Contains(sess.UserIds, uid2) {
+				return false
+			}
+
+			return true
+		})
 	})
 
 	t.Run("user2 leaves session", func(t *testing.T) {
 		err := s.commands.LeaveSession(sid, uid2)
 		assert.NilError(t, err)
 
-		s, err := s.sessionRepo.Session(sid)
+		sess, err := s.sessionRepo.Session(sid)
 		assert.NilError(t, err)
 
-		assert.Assert(t, slices.Contains(s.UserIds, uid1))
-		assert.Assert(t, !slices.Contains(s.UserIds, uid2))
-		assert.Equal(t, len(s.UserIds), 1)
+		assert.Assert(t, slices.Contains(sess.UserIds, uid1))
+		assert.Assert(t, !slices.Contains(sess.UserIds, uid2))
+		assert.Equal(t, len(sess.UserIds), 1)
 
-		// TODO: verify queries received update
+		eventually(t, func() bool {
+			sess, err := s.queries.Session(sid)
+			if errors.Is(err, session_view.ErrSessionNotFound) {
+				return false
+			}
+			assert.NilError(t, err)
+
+			if len(sess.UserIds) != 1 {
+				return false
+			}
+
+			if !slices.Contains(sess.UserIds, uid1) {
+				return false
+			}
+
+			return true
+		})
 	})
 }

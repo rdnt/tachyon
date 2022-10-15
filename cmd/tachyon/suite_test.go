@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
@@ -9,8 +10,6 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/internal/application/query"
-	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
-	"github.com/rdnt/tachyon/internal/application/query/view/user_view"
 	"github.com/rdnt/tachyon/internal/event_bus"
 	"github.com/rdnt/tachyon/internal/event_store"
 	"github.com/rdnt/tachyon/pkg/fanout"
@@ -24,8 +23,8 @@ type suite struct {
 	userRepo    *user_repository.Repo
 	projectRepo *project_repository.Repo
 	commands    command.Service
-	sessionView *session_view.View
-	userView    *user_view.View
+	sessionView *session_repository.Repo
+	userView    *user_repository.Repo
 	queries     query.Service
 }
 
@@ -51,8 +50,13 @@ func newSuite(t *testing.T) *suite {
 		userRepo,
 	)
 
-	sessionView := session_view.New()
-	userView := user_view.New()
+	sessionView, err := session_repository.New(eventStore)
+	assert.NilError(t, err)
+
+	userView, err := user_repository.New(eventStore)
+	assert.NilError(t, err)
+	//sessionView := session_view.New()
+	//userView := user_view.New()
 
 	queries := query.New(
 		eventBus,
@@ -70,5 +74,33 @@ func newSuite(t *testing.T) *suite {
 		sessionView: sessionView,
 		userView:    userView,
 		queries:     queries,
+	}
+}
+
+func eventually(t *testing.T, f func() bool) {
+	t.Helper()
+
+	ch := make(chan bool, 1)
+
+	timer := time.NewTimer(1 * time.Second)
+	defer timer.Stop()
+
+	ticker := time.NewTicker(1 * time.Nanosecond)
+	defer ticker.Stop()
+
+	for tick := ticker.C; ; {
+		select {
+		case <-timer.C:
+			t.Fail()
+			return
+		case <-tick:
+			tick = nil
+			go func() { ch <- f() }()
+		case v := <-ch:
+			if v {
+				return
+			}
+			tick = ticker.C
+		}
 	}
 }

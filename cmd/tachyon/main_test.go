@@ -3,70 +3,31 @@ package main_test
 import (
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
-	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
-	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
-	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
-	"github.com/rdnt/tachyon/internal/application/event"
-	"github.com/rdnt/tachyon/internal/application/query"
 	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
-	"github.com/rdnt/tachyon/internal/application/query/view/user_view"
-	"github.com/rdnt/tachyon/internal/event_bus"
-	"github.com/rdnt/tachyon/internal/event_store"
-	"github.com/rdnt/tachyon/pkg/fanout"
 	"gotest.tools/assert"
 )
 
 func TestTachyon(t *testing.T) {
-	eventBus := event_bus.New(fanout.New[event.Event]())
-
-	eventStore := event_store.New()
-
-	sessionRepo, err := session_repository.New(eventStore)
-	assert.NilError(t, err)
-
-	userRepo, err := user_repository.New(eventStore)
-	assert.NilError(t, err)
-
-	projectRepo, err := project_repository.New(eventStore)
-	assert.NilError(t, err)
-
-	commandSvc := command.New(
-		eventStore,
-		eventBus,
-		sessionRepo,
-		projectRepo,
-		userRepo,
-	)
-
-	sessionView := session_view.New()
-	userView := user_view.New()
-
-	queries := query.New(
-		eventBus,
-		sessionView,
-		userView,
-	)
+	s := newSuite(t)
 
 	uid := user.Id(uuid.New())
 	t.Run("create user", func(t *testing.T) {
 		name := "test user"
-		err := commandSvc.CreateUser(uid, name)
+		err := s.commands.CreateUser(uid, name)
 		assert.NilError(t, err)
 
-		u, err := userRepo.User(uid)
+		u, err := s.userRepo.User(uid)
 		assert.NilError(t, err)
 		assert.Equal(t, u.Id, uid)
 		assert.Equal(t, u.Name, name)
 
 		t.Run("can't create user with the same name", func(t *testing.T) {
-			err := commandSvc.CreateUser(uid, name)
+			err := s.commands.CreateUser(uid, name)
 			assert.Assert(t, err != nil)
 		})
 	})
@@ -74,16 +35,16 @@ func TestTachyon(t *testing.T) {
 	pid := project.Id(uuid.New())
 	t.Run("create project", func(t *testing.T) {
 		name := "first project"
-		err := commandSvc.CreateProject(pid, name, uid)
+		err := s.commands.CreateProject(pid, name, uid)
 		assert.NilError(t, err)
 
-		p, err := projectRepo.Project(pid)
+		p, err := s.projectRepo.Project(pid)
 		assert.NilError(t, err)
 		assert.Equal(t, p.Id, pid)
 		assert.Equal(t, p.Name, name)
 		assert.Equal(t, p.OwnerId, uid)
 
-		p, err = projectRepo.UserProjectByName(uid, name)
+		p, err = s.projectRepo.UserProjectByName(uid, name)
 		assert.NilError(t, err)
 		assert.Equal(t, p.Id, pid)
 		assert.Equal(t, p.Name, name)
@@ -91,7 +52,7 @@ func TestTachyon(t *testing.T) {
 
 		t.Run("this user can't create project with the same name", func(t *testing.T) {
 			pid := project.Id(uuid.New())
-			err := commandSvc.CreateProject(pid, name, uid)
+			err := s.commands.CreateProject(pid, name, uid)
 			assert.Assert(t, err != nil)
 		})
 	})
@@ -99,59 +60,31 @@ func TestTachyon(t *testing.T) {
 	sid := session.Id(uuid.New())
 	t.Run("create session", func(t *testing.T) {
 		name := "first session"
-		err := commandSvc.CreateSession(sid, name, pid)
+		err := s.commands.CreateSession(sid, name, pid)
 		assert.NilError(t, err)
 
-		s, err := sessionRepo.Session(sid)
+		sess, err := s.sessionRepo.Session(sid)
 		assert.NilError(t, err)
-		assert.Equal(t, s.Id, sid)
-		assert.Equal(t, s.Name, name)
-		assert.Equal(t, s.ProjectId, pid)
+		assert.Equal(t, sess.Id, sid)
+		assert.Equal(t, sess.Name, name)
+		assert.Equal(t, sess.ProjectId, pid)
 
 		t.Run("session can be queried", func(t *testing.T) {
 			eventually(t, func() bool {
-				s, err := queries.Session(sid)
+				sess, err := s.queries.Session(sid)
 				if errors.Is(err, session_view.ErrSessionNotFound) {
 					return false
 				}
 				assert.NilError(t, err)
 
-				return s.Id == sid
+				return sess.Id == sid
 			})
 		})
 
 		t.Run("project can't have session with the same name", func(t *testing.T) {
 			sid := session.Id(uuid.New())
-			err := commandSvc.CreateSession(sid, name, pid)
+			err := s.commands.CreateSession(sid, name, pid)
 			assert.Assert(t, err != nil)
 		})
 	})
-}
-
-func eventually(t *testing.T, f func() bool) {
-	t.Helper()
-
-	ch := make(chan bool, 1)
-
-	timer := time.NewTimer(1 * time.Second)
-	defer timer.Stop()
-
-	ticker := time.NewTicker(1 * time.Nanosecond)
-	defer ticker.Stop()
-
-	for tick := ticker.C; ; {
-		select {
-		case <-timer.C:
-			t.Fail()
-			return
-		case <-tick:
-			tick = nil
-			go func() { ch <- f() }()
-		case v := <-ch:
-			if v {
-				return
-			}
-			tick = ticker.C
-		}
-	}
 }
