@@ -44,6 +44,8 @@ type Service interface {
 	CreateSession(id session.Id, name string, projectId project.Id) error
 	JoinSession(id session.Id, uid user.Id) error
 	LeaveSession(id session.Id, uid user.Id) error
+
+	CreatePath(args CreatePathArgs) error
 }
 
 type service struct {

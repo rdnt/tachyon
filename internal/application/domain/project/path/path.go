@@ -5,9 +5,11 @@ import (
 	"image/color"
 	"strconv"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
-type Id string
+type Id uuid.UUID
 
 type Path struct {
 	Id     Id
