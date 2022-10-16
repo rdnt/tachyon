@@ -5,8 +5,6 @@ import (
 	"image/color"
 	"strconv"
 	"strings"
-
-	"github.com/rdnt/tachyon/internal/application/domain/project/path/point"
 )
 
 type Id string
@@ -15,7 +13,12 @@ type Path struct {
 	Id     Id
 	Tool   Tool
 	Color  Color
-	Points []point.Id
+	Points []Vector2
+}
+
+type Vector2 struct {
+	X float64
+	Y float64
 }
 
 type Tool string
@@ -45,7 +48,7 @@ func ColorFromString(s string) (c Color, err error) {
 	}, nil
 }
 
-func New(id Id, tool Tool, color Color, points []point.Id) Path {
+func New(id Id, tool Tool, color Color, points []Vector2) Path {
 	return Path{
 		Id:     id,
 		Tool:   tool,
