@@ -85,7 +85,7 @@ func main() {
 				fmt.Println("users:", userView)
 			case "create user":
 				uid := uuid.New()
-				err := commandSvc.CreateUser(user.Id(uid), "tasos")
+				err := commandSvc.CreateUser(user.Id(uid), "user-1")
 				if err != nil {
 					panic(err)
 				}
@@ -102,7 +102,7 @@ func main() {
 				//}
 
 				//for i := 0; i < 1000; i++ {
-				//	u, err := querySvc.User("tasos")
+				//	u, err := querySvc.User("user-1")
 				//	if err != nil {
 				//		fmt.Println(err)
 				//		continue

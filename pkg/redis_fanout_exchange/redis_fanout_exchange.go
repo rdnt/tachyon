@@ -4,8 +4,6 @@ import (
 	"github.com/go-redis/redis"
 )
 
-//var errBusyGroup = "BUSYGROUP Consumer Group name already exists"
-
 type Exchange struct {
 	client *redis.Client
 }

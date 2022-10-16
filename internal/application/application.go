@@ -14,15 +14,3 @@ type Commands interface {
 type Queries interface {
 	Session(id session.Id) (session.Session, error)
 }
-
-type App struct {
-	Commands
-	Queries
-}
-
-func New(cmds Commands, qs Queries) *App {
-	return &App{
-		Commands: cmds,
-		Queries:  qs,
-	}
-}

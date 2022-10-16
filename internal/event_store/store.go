@@ -36,7 +36,7 @@ func (s *Store) String() string {
 		Event event.Event
 	}
 
-	events := []storedEvent{}
+	var events []storedEvent
 
 	for _, e := range s.events {
 		events = append(events, storedEvent{

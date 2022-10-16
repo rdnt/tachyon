@@ -16,6 +16,9 @@ import (
 	"github.com/mattn/go-colorable"
 )
 
+// Color is an alias to aurora's color
+type Color aurora.Color
+
 const (
 	Reset = Color(0)
 
@@ -42,8 +45,6 @@ var (
 	stdoutWriter *syncwriter.Writer
 	stderrWriter *syncwriter.Writer
 )
-
-type Color int
 
 type Logger struct {
 	sync.Mutex

@@ -5,47 +5,47 @@ import (
 	"sync"
 )
 
-type Fanout[E any] struct {
-	lock  sync.Mutex
-	conns []chan E
+type Exchange[E any] interface {
+	Publish(event E) error
+	Subscribe() (chan E, error)
 }
 
-func New[E any]() *Fanout[E] {
-	return &Fanout[E]{conns: []chan E{}}
+type FanOut[E any] struct {
+	lock          sync.Mutex
+	subscriptions []chan E
 }
 
-func (f *Fanout[E]) Subscribe() (chan E, error) {
+func New[E any]() Exchange[E] {
+	return &FanOut[E]{subscriptions: []chan E{}}
+}
+
+func (f *FanOut[E]) Subscribe() (chan E, error) {
 	f.lock.Lock()
 	defer f.lock.Unlock()
 
-	if f.conns == nil {
-		f.conns = []chan E{}
+	if f.subscriptions == nil {
+		f.subscriptions = []chan E{}
 	}
 
-	conn := make(chan E)
+	sub := make(chan E)
 
-	f.conns = append(f.conns, conn)
+	f.subscriptions = append(f.subscriptions, sub)
 
-	return conn, nil
+	return sub, nil
 }
 
-func (f *Fanout[E]) Publish(event E) error {
+func (f *FanOut[E]) Publish(event E) error {
 	f.lock.Lock()
-	conns := f.conns
+	subs := f.subscriptions
 	f.lock.Unlock()
 
-	for _, conn := range conns {
+	for _, conn := range subs {
 		conn <- event
 	}
 
 	return nil
 }
 
-func (f *Fanout[E]) String() string {
-	return fmt.Sprintln(len(f.conns), "connections")
-}
-
-type exchange[E any] interface {
-	Publish(event E) error
-	Subscribe() (chan E, error)
+func (f *FanOut[E]) String() string {
+	return fmt.Sprintln(len(f.subscriptions), "subscriptions")
 }

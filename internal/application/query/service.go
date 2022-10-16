@@ -57,7 +57,7 @@ func New(events EventBus, sessions SessionView, users UserView) Service {
 	//			}
 	//
 	//			for e := range events {
-	//				log.Debug("[view] recv ", e)
+	//				log.Debug("[view] receive ", e)
 	//				err = s.handleEvent(e)
 	//				if err != nil {
 	//					log.Error(err)
