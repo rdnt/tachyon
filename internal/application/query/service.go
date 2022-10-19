@@ -1,6 +1,7 @@
 package query
 
 import (
+	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
@@ -21,15 +22,22 @@ type UserView interface {
 	//CreateUser(u user.User) error
 }
 
+type ProjectView interface {
+	Project(id project.Id) (project.Project, error)
+	//CreateUser(u user.User) error
+}
+
 type Service interface {
 	Session(id session.Id) (session.Session, error)
 	User(id user.Id) (user.User, error)
+	Project(id project.Id) (project.Project, error)
 }
 
 type service struct {
 	events   EventBus
 	sessions SessionView
 	users    UserView
+	projects ProjectView
 }
 
 func (s *service) Session(id session.Id) (session.Session, error) {
@@ -40,11 +48,16 @@ func (s *service) User(id user.Id) (user.User, error) {
 	return s.users.User(id)
 }
 
-func New(events EventBus, sessions SessionView, users UserView) Service {
+func (s *service) Project(id project.Id) (project.Project, error) {
+	return s.projects.Project(id)
+}
+
+func New(events EventBus, sessions SessionView, users UserView, projects ProjectView) Service {
 	s := &service{
+		events:   events,
 		sessions: sessions,
 		users:    users,
-		events:   events,
+		projects: projects,
 	}
 
 	//go func() {

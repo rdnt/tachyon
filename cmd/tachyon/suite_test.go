@@ -25,6 +25,7 @@ type suite struct {
 	commands    command.Service
 	sessionView *session_repository.Repo
 	userView    *user_repository.Repo
+	projectView *project_repository.Repo
 	queries     query.Service
 }
 
@@ -55,6 +56,9 @@ func newSuite(t *testing.T) *suite {
 
 	userView, err := user_repository.New(eventStore)
 	assert.NilError(t, err)
+
+	projectView, err := project_repository.New(eventStore)
+	assert.NilError(t, err)
 	//sessionView := session_view.New()
 	//userView := user_view.New()
 
@@ -62,6 +66,7 @@ func newSuite(t *testing.T) *suite {
 		eventBus,
 		sessionView,
 		userView,
+		projectView,
 	)
 
 	return &suite{
@@ -73,6 +78,7 @@ func newSuite(t *testing.T) *suite {
 		commands:    commands,
 		sessionView: sessionView,
 		userView:    userView,
+		projectView: projectView,
 		queries:     queries,
 	}
 }

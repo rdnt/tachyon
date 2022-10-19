@@ -45,7 +45,7 @@ func TestDrawPixel(t *testing.T) {
 		assert.NilError(t, err)
 
 		eventually(t, func() bool {
-			proj, err := s.projectRepo.Project(pid)
+			proj, err := s.queries.Project(pid)
 			if errors.Is(err, command.ErrProjectNotFound) {
 				return false
 			}
@@ -67,7 +67,7 @@ func TestDrawPixel(t *testing.T) {
 		assert.NilError(t, err)
 
 		eventually(t, func() bool {
-			proj, err := s.projectRepo.Project(pid)
+			proj, err := s.queries.Project(pid)
 			if errors.Is(err, command.ErrProjectNotFound) {
 				return false
 			}

@@ -51,10 +51,16 @@ func main() {
 	sessionView := session_view.New()
 	userView := user_view.New()
 
+	projectView, err := project_repository.New(eventStore)
+	if err != nil {
+		panic(err)
+	}
+
 	querySvc := query.New(
 		eventBus,
 		sessionView,
 		userView,
+		projectView,
 	)
 
 	c := make(chan os.Signal, 1)
