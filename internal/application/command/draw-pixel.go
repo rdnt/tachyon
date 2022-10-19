@@ -4,22 +4,19 @@ import (
 	"errors"
 
 	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/project/path"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
 	"golang.org/x/exp/slices"
 )
 
-type CreatePathArgs struct {
-	PathId    path.Id
+type DrawPixelArgs struct {
 	UserId    user.Id
 	ProjectId project.Id
-	Tool      path.Tool
-	Color     path.Color
-	Point     path.Vector2
+	Color     project.Color
+	Coords    project.Vector2
 }
 
-func (s *service) CreatePath(args CreatePathArgs) error {
+func (s *service) DrawPixel(args DrawPixelArgs) error {
 	proj, err := s.projects.Project(args.ProjectId)
 	if err != nil {
 		return err
@@ -42,13 +39,11 @@ func (s *service) CreatePath(args CreatePathArgs) error {
 		return errors.New("user doesn't have access to the project")
 	}
 
-	e := event.NewPathCreatedEvent(event.PathCreatedEvent{
-		PathId:    args.PathId,
+	e := event.NewPixelDrawnEvent(event.PixelDrawnEvent{
 		UserId:    args.UserId,
 		ProjectId: proj.Id,
-		Tool:      args.Tool,
 		Color:     args.Color,
-		Point:     args.Point,
+		Coords:    args.Coords,
 	})
 
 	err = s.publish(e)

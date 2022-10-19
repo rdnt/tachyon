@@ -4,22 +4,18 @@ import (
 	"errors"
 
 	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/project/path"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
 	"golang.org/x/exp/slices"
 )
 
-type CreatePathArgs struct {
-	PathId    path.Id
+type ErasePixelArgs struct {
 	UserId    user.Id
 	ProjectId project.Id
-	Tool      path.Tool
-	Color     path.Color
-	Point     path.Vector2
+	Coords    project.Vector2
 }
 
-func (s *service) CreatePath(args CreatePathArgs) error {
+func (s *service) ErasePixel(args ErasePixelArgs) error {
 	proj, err := s.projects.Project(args.ProjectId)
 	if err != nil {
 		return err
@@ -42,13 +38,20 @@ func (s *service) CreatePath(args CreatePathArgs) error {
 		return errors.New("user doesn't have access to the project")
 	}
 
-	e := event.NewPathCreatedEvent(event.PathCreatedEvent{
-		PathId:    args.PathId,
+	//for _, pix := range proj.Pixels {
+	//	if pix.Coords.X == args.Coords.X && pix.Coords.Y == args.Coords.Y {
+	//		idx := slices.IndexFunc(proj.Pixels, func(p project.Pixel) bool {
+	//			return pix.Coords.X == args.Coords.X && pix.Coords.Y == args.Coords.Y
+	//		})
+	//
+	//		proj.Pixels = slices.Delete(proj.Pixels, idx, idx+1)
+	//	}
+	//}
+
+	e := event.NewPixelErasedEvent(event.PixelErasedEvent{
 		UserId:    args.UserId,
 		ProjectId: proj.Id,
-		Tool:      args.Tool,
-		Color:     args.Color,
-		Point:     args.Point,
+		Coords:    args.Coords,
 	})
 
 	err = s.publish(e)

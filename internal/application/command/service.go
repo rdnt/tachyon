@@ -22,6 +22,7 @@ var ErrSessionNotFound = errors.New("session not found")
 type SessionRepository interface {
 	Session(id session.Id) (session.Session, error)
 	ProjectSessionByName(pid project.Id, name string) (session.Session, error)
+	ProjectSessions(pid project.Id) ([]session.Session, error)
 }
 
 var ErrProjectNotFound = errors.New("project not found")
@@ -46,6 +47,9 @@ type Service interface {
 	LeaveSession(id session.Id, uid user.Id) error
 
 	CreatePath(args CreatePathArgs) error
+
+	DrawPixel(args DrawPixelArgs) error
+	ErasePixel(args ErasePixelArgs) error
 }
 
 type service struct {

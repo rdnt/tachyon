@@ -48,6 +48,20 @@ func (r *Repo) ProjectSessionByName(pid project.Id, name string) (session.Sessio
 	return session.Session{}, command.ErrSessionNotFound
 }
 
+func (r *Repo) ProjectSessions(pid project.Id) ([]session.Session, error) {
+	r.mux.Lock()
+	defer r.mux.Unlock()
+
+	var sessions []session.Session
+	for _, s := range r.sessions {
+		if pid == s.ProjectId {
+			sessions = append(sessions, s.Session)
+		}
+	}
+
+	return sessions, nil
+}
+
 func (r *Repo) String() string {
 	return fmt.Sprint(r.sessions)
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/project/path"
-	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"gotest.tools/assert"
 )
@@ -27,14 +26,7 @@ func TestPath(t *testing.T) {
 		assert.NilError(t, err)
 	})
 
-	sid := session.Id(uuid.New())
-	t.Run("create session", func(t *testing.T) {
-		err := s.commands.CreateSession(sid, "session-1", pid)
-		assert.NilError(t, err)
-	})
-
 	pathId := path.Id(uuid.New())
-
 	t.Run("create path", func(t *testing.T) {
 		tool := path.Pen
 
@@ -49,7 +41,7 @@ func TestPath(t *testing.T) {
 		err = s.commands.CreatePath(command.CreatePathArgs{
 			PathId:    pathId,
 			UserId:    uid,
-			SessionId: sid,
+			ProjectId: pid,
 			Tool:      tool,
 			Color:     color,
 			Point:     point,
