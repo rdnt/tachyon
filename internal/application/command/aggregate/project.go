@@ -12,7 +12,7 @@ type Project struct {
 	project.Project
 }
 
-func (p *Project) ProcessEvent(e event.Event) {
+func (p *Project) ProcessEvent(e event.EventIface) {
 	switch e := e.(type) {
 	case event.ProjectCreatedEvent:
 		p.Id = e.Id

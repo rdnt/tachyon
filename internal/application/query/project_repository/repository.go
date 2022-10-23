@@ -11,13 +11,12 @@ import (
 	"github.com/rdnt/tachyon/internal/application/event"
 )
 
-type EventStore interface {
-	Events() ([]event.EventIface, error)
-	Subscribe(h func(e event.EventIface)) (dispose func(), err error)
+type EventBus interface {
+	Subscribe() (chan event.EventIface, error)
 }
 
 type Repo struct {
-	store    EventStore
+	bus      EventBus
 	mux      sync.Mutex
 	projects map[project.Id]*aggregate.Project
 	dispose  func()
@@ -71,27 +70,22 @@ func (r *Repo) processEvents(events ...event.EventIface) {
 	r.mux.Unlock()
 }
 
-func New(store EventStore) (*Repo, error) {
+func New(bus EventBus) (*Repo, error) {
 	r := &Repo{
-		store:    store,
+		bus:      bus,
 		projects: map[project.Id]*aggregate.Project{},
 	}
 
-	events, err := store.Events()
+	events, err := bus.Subscribe()
 	if err != nil {
 		return nil, err
 	}
 
-	r.processEvents(events...)
-
-	dispose, err := store.Subscribe(func(e event.EventIface) {
-		r.processEvents(e)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	r.dispose = dispose
+	go func() {
+		for e := range events {
+			r.processEvents(e)
+		}
+	}()
 
 	return r, nil
 }

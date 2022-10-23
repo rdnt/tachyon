@@ -36,13 +36,10 @@ func (e *Exchange) Subscribe() (chan []byte, error) {
 	go func() {
 		for {
 			func() {
-				streams, err := e.client.XReadGroup(&redis.XReadGroupArgs{
-					Group:    "query",
-					Consumer: "1",
-					Streams:  []string{"events", ">"},
-					Count:    0,
-					Block:    0,
-					NoAck:    true,
+				streams, err := e.client.XRead(&redis.XReadArgs{
+					Streams: []string{"events", "$"},
+					Count:   0,
+					Block:   0,
 				}).Result()
 
 				if err != nil {

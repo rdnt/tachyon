@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	gookitcolor "github.com/gookit/color"
@@ -22,10 +23,14 @@ type model struct {
 }
 
 func (m *model) Init() tea.Cmd {
-	return nil
+	return tea.Batch(
+		tick(),
+	)
 }
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
@@ -53,25 +58,31 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c":
 			return m, tea.Quit
 		}
+
+	case time.Time:
+		cmds = append(cmds, tick())
 	}
-	return m, nil
+
+	return m, tea.Batch(cmds...)
 }
 
 func (m model) View() string {
+	proj, err := m.queries.Project(m.projectId)
+	if err != nil {
+		return ""
+	}
+
 	canvas := make([][]gookitcolor.RGBColor, m.height)
 	for i := range canvas {
 		canvas[i] = make([]gookitcolor.RGBColor, m.width)
 	}
 
-	proj, err := m.queries.Project(m.projectId)
-	if err != nil {
-		panic(err)
-	}
-
 	for _, p := range proj.Pixels {
-		if p.Coords.Y >= len(canvas) || p.Coords.X >= len(canvas[p.Coords.Y]) {
-			canvas[p.Coords.Y][p.Coords.X] = gookitcolor.Hex(fmt.Sprintf("#%02x%02x%02x", p.Color.R, p.Color.G, p.Color.B), true)
+		if p.Coords.Y >= m.height || p.Coords.X >= m.width {
+			continue
 		}
+
+		canvas[p.Coords.Y][p.Coords.X] = gookitcolor.Hex(fmt.Sprintf("#%02x%02x%02x", p.Color.R, p.Color.G, p.Color.B), true)
 	}
 
 	var s strings.Builder
@@ -83,4 +94,12 @@ func (m model) View() string {
 	}
 
 	return strings.TrimSuffix(s.String(), "\n")
+}
+
+func tick() tea.Cmd {
+	return tea.Tick(
+		16*time.Millisecond, func(t time.Time) tea.Msg {
+			return t
+		},
+	)
 }

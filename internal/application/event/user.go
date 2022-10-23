@@ -10,7 +10,7 @@ const (
 )
 
 type UserCreatedEvent struct {
-	event
+	Event
 
 	Id   user.Id
 	Name string

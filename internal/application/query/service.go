@@ -8,7 +8,7 @@ import (
 )
 
 type EventBus interface {
-	Subscribe() (chan event.Event, error)
+	Subscribe() (chan event.EventIface, error)
 }
 
 type SessionView interface {

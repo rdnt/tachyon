@@ -14,7 +14,7 @@ const (
 )
 
 type SessionCreatedEvent struct {
-	event
+	Event
 
 	ProjectId project.Id
 	Id        session.Id
@@ -31,7 +31,7 @@ func NewSessionCreatedEvent(e SessionCreatedEvent) SessionCreatedEvent {
 }
 
 type JoinedSessionEvent struct {
-	event
+	Event
 
 	SessionId session.Id
 	UserId    user.Id
@@ -46,7 +46,7 @@ func NewJoinedSessionEvent(e JoinedSessionEvent) JoinedSessionEvent {
 }
 
 type LeftSessionEvent struct {
-	event
+	Event
 
 	SessionId session.Id
 	UserId    user.Id

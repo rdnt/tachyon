@@ -11,7 +11,7 @@ type User struct {
 	user.User
 }
 
-func (u *User) ProcessEvent(e event.Event) {
+func (u *User) ProcessEvent(e event.EventIface) {
 	switch e := e.(type) {
 	case event.UserCreatedEvent:
 		u.Id = e.Id

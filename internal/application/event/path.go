@@ -12,7 +12,7 @@ const (
 )
 
 type PathCreatedEvent struct {
-	event
+	Event
 
 	PathId    path.Id
 	UserId    user.Id

@@ -11,7 +11,7 @@ const (
 )
 
 type ProjectCreatedEvent struct {
-	event
+	Event
 
 	Id      project.Id
 	OwnerId user.Id

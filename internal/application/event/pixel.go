@@ -12,7 +12,7 @@ const (
 )
 
 type PixelDrawnEvent struct {
-	event
+	Event
 
 	UserId    user.Id
 	ProjectId project.Id
@@ -21,7 +21,7 @@ type PixelDrawnEvent struct {
 }
 
 func NewPixelDrawnEvent(e PixelDrawnEvent) PixelDrawnEvent {
-	e.typ = PathCreated
+	e.typ = PixelDrawn
 	e.aggregateType = Project
 	e.aggregateId = uuid.UUID(e.ProjectId)
 
@@ -29,7 +29,7 @@ func NewPixelDrawnEvent(e PixelDrawnEvent) PixelDrawnEvent {
 }
 
 type PixelErasedEvent struct {
-	event
+	Event
 
 	UserId    user.Id
 	ProjectId project.Id
@@ -37,7 +37,7 @@ type PixelErasedEvent struct {
 }
 
 func NewPixelErasedEvent(e PixelErasedEvent) PixelErasedEvent {
-	e.typ = PathCreated
+	e.typ = PixelErased
 	e.aggregateType = Project
 	e.aggregateId = uuid.UUID(e.ProjectId)
 

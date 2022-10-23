@@ -12,8 +12,8 @@ import (
 )
 
 type EventStore interface {
-	Events() ([]event.Event, error)
-	Subscribe(h func(e event.Event)) (dispose func(), err error)
+	Events() ([]event.EventIface, error)
+	Subscribe(h func(e event.EventIface)) (dispose func(), err error)
 }
 
 type Repo struct {
@@ -66,7 +66,7 @@ func (r *Repo) String() string {
 	return fmt.Sprint(r.sessions)
 }
 
-func (r *Repo) processEvents(events ...event.Event) {
+func (r *Repo) processEvents(events ...event.EventIface) {
 	r.mux.Lock()
 
 	for _, e := range events {
@@ -98,7 +98,7 @@ func New(store EventStore) (*Repo, error) {
 
 	r.processEvents(events...)
 
-	dispose, err := store.Subscribe(func(e event.Event) {
+	dispose, err := store.Subscribe(func(e event.EventIface) {
 		r.processEvents(e)
 	})
 	if err != nil {

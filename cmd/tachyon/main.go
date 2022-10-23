@@ -14,7 +14,6 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
-	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/internal/application/query"
 	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
 	"github.com/rdnt/tachyon/internal/application/query/view/user_view"
@@ -24,7 +23,7 @@ import (
 )
 
 func main() {
-	eventBus := event_bus.New(fanout.New[event.Event]())
+	eventBus := event_bus.New(fanout.New[Event]())
 
 	eventStore := event_store.New()
 	sessionRepo, err := session_repository.New(eventStore)

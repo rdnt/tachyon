@@ -2,28 +2,49 @@ package event
 
 import "github.com/google/uuid"
 
-type Event interface {
+type EventRWIface interface {
+	Type() Type
+	SetType(typ Type)
+	AggregateType() AggregateType
+	SetAggregateType(typ AggregateType)
+	AggregateId() uuid.UUID
+	SetAggregateId(id uuid.UUID)
+}
+
+type EventIface interface {
 	Type() Type
 	AggregateType() AggregateType
 	AggregateId() uuid.UUID
 }
 
-type event struct {
+type Event struct {
 	typ           Type
 	aggregateType AggregateType
 	aggregateId   uuid.UUID
 }
 
-func (e event) Type() Type {
+func (e Event) Type() Type {
 	return e.typ
 }
 
-func (e event) AggregateType() AggregateType {
+func (e *Event) SetType(typ Type) {
+	e.typ = typ
+}
+
+func (e Event) AggregateType() AggregateType {
 	return e.aggregateType
 }
 
-func (e event) AggregateId() uuid.UUID {
+func (e *Event) SetAggregateType(aggregateType AggregateType) {
+	e.aggregateType = aggregateType
+}
+
+func (e Event) AggregateId() uuid.UUID {
 	return e.aggregateId
+}
+
+func (e *Event) SetAggregateId(aggregateId uuid.UUID) {
+	e.aggregateId = aggregateId
 }
 
 type AggregateType string

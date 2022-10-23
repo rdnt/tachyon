@@ -1,46 +1,83 @@
 package event_store
 
 import (
-	"sync"
+	"encoding/json"
+	"fmt"
 
 	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/log"
 	"github.com/rdnt/tachyon/pkg/broker"
 	"github.com/sanity-io/litter"
 )
 
+type FanOutExchange[E any] interface {
+	Publish(event E) error
+	Subscribe() (chan E, error)
+}
+
 type Store struct {
-	mux    sync.Mutex
-	events []event.EventIface
-	broker *broker.Broker[event.EventIface]
+	exchange FanOutExchange[[]byte]
+}
+
+type redisEvent struct {
+	Event         event.EventRWIface
+	Type          event.Type
+	AggregateType event.AggregateType
+	AggregateId   uuid.UUID
 }
 
 func (s *Store) Subscribe(h func(e event.EventIface)) (dispose func(), err error) {
-	return s.broker.Subscribe(h), nil
+	byts, err := s.exchange.Subscribe()
+	if err != nil {
+		return nil, err
+	}
+
+	done := make(chan bool)
+
+	dispose = func() {
+		close(byts)
+		<-done
+	}
+
+	go func() {
+		for byt := range byts {
+			var evt redisEvent
+
+			err := json.Unmarshal(byt, &evt)
+			if err != nil {
+				log.Error(err)
+				continue
+			}
+
+			e := evt.Event.(event.EventRWIface)
+			e.SetType(evt.Type)
+			e.SetAggregateType(evt.AggregateType)
+			e.SetAggregateId(evt.AggregateId)
+
+			fmt.Println("received event", e)
+
+			h(e)
+		}
+
+		done <- true
+	}()
+
+	return dispose, nil
 }
 
 func (s *Store) Events() ([]event.EventIface, error) {
-	s.mux.Lock()
-	defer s.mux.Unlock()
-
 	return s.events, nil
 }
 
 func (s *Store) Publish(e event.EventIface) error {
-	s.mux.Lock()
 	s.events = append(s.events, e)
-	s.mux.Unlock()
-
 	s.broker.Publish(e)
 
 	return nil
 }
 
 func (s *Store) String() string {
-	s.mux.Lock()
-	storedEvents := s.events
-	s.mux.Unlock()
-
 	type storedEvent struct {
 		Type          event.Type
 		AggregateType event.AggregateType
@@ -51,7 +88,7 @@ func (s *Store) String() string {
 
 	var events []storedEvent
 
-	for _, e := range storedEvents {
+	for _, e := range s.events {
 		events = append(events, storedEvent{
 			Type:          e.Type(),
 			AggregateType: e.AggregateType(),
@@ -71,7 +108,6 @@ func (s *Store) String() string {
 
 func New() *Store {
 	return &Store{
-		events: make([]event.EventIface, 0),
 		broker: broker.New[event.EventIface](),
 	}
 }

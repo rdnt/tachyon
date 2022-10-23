@@ -10,11 +10,11 @@ import (
 )
 
 type EventStore interface {
-	Publish(event event.Event) error
+	Publish(event event.EventIface) error
 }
 
 type EventBus interface {
-	Publish(event event.Event) error
+	Publish(event event.EventIface) error
 }
 
 var ErrSessionNotFound = errors.New("session not found")
@@ -60,7 +60,7 @@ type service struct {
 	bus      EventBus
 }
 
-func (s *service) publish(e event.Event) error {
+func (s *service) publish(e event.EventIface) error {
 	err := s.store.Publish(e)
 	if err != nil {
 		return err
