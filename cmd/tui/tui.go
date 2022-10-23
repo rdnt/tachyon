@@ -13,7 +13,8 @@ import (
 )
 
 type model struct {
-	canvas    [][]gookitcolor.RGBColor
+	width     int
+	height    int
 	commands  command.Service
 	queries   query.Service
 	userId    user.Id
@@ -34,10 +35,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// This will be a 2D slice of strings. We use strings and not runes so
 		// that we can store the style of the character drawn as well so that
 		// each cell can be a different style / color.
-		m.canvas = make([][]gookitcolor.RGBColor, msg.Height)
-		for i := range m.canvas {
-			m.canvas[i] = make([]gookitcolor.RGBColor, msg.Width)
-		}
+		m.width = msg.Width
+		m.height = msg.Height
 	case tea.MouseMsg:
 		switch msg.Type {
 		case tea.MouseLeft:
@@ -70,17 +69,24 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+	canvas := make([][]gookitcolor.RGBColor, m.height)
+	for i := range canvas {
+		canvas[i] = make([]gookitcolor.RGBColor, m.width)
+	}
+
 	proj, err := m.queries.Project(m.projectId)
 	if err != nil {
 		panic(err)
 	}
 
 	for _, p := range proj.Pixels {
-		m.canvas[p.Coords.Y][p.Coords.X] = gookitcolor.Hex(fmt.Sprintf("#%02x%02x%02x", p.Color.R, p.Color.G, p.Color.B), true)
+		if p.Coords.Y >= len(canvas) || p.Coords.X >= len(canvas[p.Coords.Y]) {
+			canvas[p.Coords.Y][p.Coords.X] = gookitcolor.Hex(fmt.Sprintf("#%02x%02x%02x", p.Color.R, p.Color.G, p.Color.B), true)
+		}
 	}
 
 	var s strings.Builder
-	for _, row := range m.canvas {
+	for _, row := range canvas {
 		for _, clr := range row {
 			s.WriteString(clr.Sprint(" "))
 		}
