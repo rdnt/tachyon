@@ -21,7 +21,6 @@ type model struct {
 	projectId project.Id
 }
 
-// Init initializes the model with the initial state.
 func (m *model) Init() tea.Cmd {
 	return nil
 }
@@ -29,21 +28,11 @@ func (m *model) Init() tea.Cmd {
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		// On window resize, we want to create a replica grid
-		// (called the canvas) for the user to draw on.
-		//
-		// This will be a 2D slice of strings. We use strings and not runes so
-		// that we can store the style of the character drawn as well so that
-		// each cell can be a different style / color.
 		m.width = msg.Width
 		m.height = msg.Height
 	case tea.MouseMsg:
 		switch msg.Type {
 		case tea.MouseLeft:
-			// When the user clicks on the mouse, we want to write the
-			// character to the current position of the mouse in the grid, so
-			// that we can draw it later.
-			//m.canvas[msg.Y][msg.X] = gookitcolor.Hex("#ffffff", true)
 			err := m.commands.DrawPixel(command.DrawPixelArgs{
 				UserId:    m.userId,
 				ProjectId: m.projectId,
@@ -92,6 +81,6 @@ func (m model) View() string {
 		}
 		s.WriteString("\n")
 	}
-	return strings.TrimSuffix(s.String(), "\n")
 
+	return strings.TrimSuffix(s.String(), "\n")
 }
