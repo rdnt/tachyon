@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-redis/redis"
-	"github.com/rdnt/tachyon/internal/pkg/interfaces"
 	"time"
+
+	"github.com/go-redis/redis/v9"
+	"github.com/rdnt/tachyon/internal/pkg/interfaces"
 )
 
 type RedisClient struct {
@@ -33,11 +34,10 @@ func (r *RedisClient) Publish(e interfaces.Event) error {
 		return err
 	}
 
-	err = r.client.XAdd(&redis.XAddArgs{
-		Stream:       r.streamKey,
-		MaxLen:       0,
-		MaxLenApprox: 0,
-		ID:           "*",
+	err = r.client.XAdd(context.Background(), &redis.XAddArgs{
+		Stream: r.streamKey,
+		MaxLen: 0,
+		ID:     "*",
 		Values: map[string]interface{}{
 			"event": string(b),
 		},
@@ -57,32 +57,25 @@ func (r *RedisClient) Subscribe() (chan interfaces.Event, func(), error) {
 	done := make(chan bool)
 
 	dispose := func() {
-		fmt.Println("disposing...")
 		cancel()
-		close(events)
-		fmt.Println("disposed")
+		<-done
 	}
 
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("default stmt")
 				close(events)
 				done <- true
 				return
 			default:
-				fmt.Println("listen")
-				streams, err := r.client.WithContext(ctx).XRead(&redis.XReadArgs{
+				streams, err := r.client.XRead(ctx, &redis.XReadArgs{
 					Streams: []string{r.streamKey, "$"},
-					Count:   0,
-					Block:   10 * time.Second,
+					Block:   100 * time.Millisecond,
 				}).Result()
 				if err != nil {
 					continue
 				}
-
-				fmt.Println(streams)
 
 				if len(streams) == 0 {
 					continue
@@ -105,7 +98,7 @@ func (r *RedisClient) Subscribe() (chan interfaces.Event, func(), error) {
 }
 
 func (r *RedisClient) Events() ([]interfaces.Event, error) {
-	msgs, err := r.client.XRange(r.streamKey, "-", "+").Result()
+	msgs, err := r.client.XRange(context.Background(), r.streamKey, "-", "+").Result()
 	if err != nil {
 		return nil, err
 	}

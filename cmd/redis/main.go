@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/rdnt/tachyon/internal/pkg/redisclient"
 	"os"
 	"os/signal"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v9"
+	"github.com/rdnt/tachyon/internal/pkg/redisclient"
 )
 
 func main() {
@@ -39,15 +39,26 @@ func main() {
 
 	go func() {
 		time.Sleep(1 * time.Second)
-		err := rc.Publish("hello :D")
+		err := rc.Publish("test")
 		if err != nil {
 			panic(err)
 		}
+		time.Sleep(10 * time.Millisecond)
+		err = rc.Publish("test")
+		if err != nil {
+			panic(err)
+		}
+		time.Sleep(10 * time.Millisecond)
+		err = rc.Publish("test")
+		if err != nil {
+			panic(err)
+		}
+		time.Sleep(10 * time.Millisecond)
 
 		fmt.Println(rc.Events())
 		time.Sleep(1 * time.Second)
 
-		err = rc.Publish("hello again :D")
+		err = rc.Publish("test")
 		if err != nil {
 			panic(err)
 		}
