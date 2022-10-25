@@ -2,6 +2,9 @@ package router
 
 import (
 	"encoding/json"
+	"github.com/rdnt/tachyon/internal/application/domain/project"
+	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 
 	"github.com/rdnt/tachyon/internal/application/event"
 )
@@ -12,10 +15,10 @@ type Event struct {
 	AggregateId   string `json:"aggregateId"`
 }
 
-//const (
+// const (
 //	PixelDrawn  event.Type = "pixel_drawn"
 //	PixelErased event.Type = "pixel_erased"
-//)
+// )
 
 type PixelDrawnEvent struct {
 	Event
@@ -38,14 +41,34 @@ func jsonEvent(e event.Event) Event {
 func PixelDrawnEventJSON(e event.PixelDrawnEvent) ([]byte, error) {
 	evt := PixelDrawnEvent{
 		Event:     jsonEvent(e),
-		UserId:    e.UserId.String(),
-		ProjectId: e.ProjectId.String(),
+		UserId:    uuid.UUID(e.UserId).String(),
+		ProjectId: uuid.UUID(e.ProjectId).String(),
 		Color:     e.Color.String(),
 		X:         e.Coords.X,
 		Y:         e.Coords.Y,
 	}
 
 	return json.Marshal(evt)
+}
+
+func PixelDrawnEventFromJSON(b []byte) (event.PixelDrawnEvent, error) {
+	var evt PixelDrawnEvent
+	err := json.Unmarshal(b, &evt)
+	if err != nil {
+		return event.PixelDrawnEvent{}, err
+	}
+
+	uid, err := uuid.Parse(evt.UserId)
+	if err != nil {
+		return event.PixelDrawnEvent{}, err
+	}
+
+	return event.NewPixelDrawnEvent(event.PixelDrawnEvent{
+		UserId:    user.Id(uuid.Parse(evt.UserId)),
+		ProjectId: project.Id{},
+		Color:     project.Color{},
+		Coords:    project.Vector2{},
+	})
 }
 
 type PixelErasedEvent struct {

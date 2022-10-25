@@ -1,8 +1,8 @@
 package event
 
 import (
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 const (
@@ -10,7 +10,7 @@ const (
 )
 
 type UserCreatedEvent struct {
-	Event
+	event
 
 	Id   user.Id
 	Name string

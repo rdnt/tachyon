@@ -1,10 +1,10 @@
 package event
 
 import (
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 )
 
 type SessionCreatedEvent struct {
-	Event
+	event
 
 	ProjectId project.Id
 	Id        session.Id
@@ -31,7 +31,7 @@ func NewSessionCreatedEvent(e SessionCreatedEvent) SessionCreatedEvent {
 }
 
 type JoinedSessionEvent struct {
-	Event
+	event
 
 	SessionId session.Id
 	UserId    user.Id
@@ -46,7 +46,7 @@ func NewJoinedSessionEvent(e JoinedSessionEvent) JoinedSessionEvent {
 }
 
 type LeftSessionEvent struct {
-	Event
+	event
 
 	SessionId session.Id
 	UserId    user.Id

@@ -1,9 +1,9 @@
 package event
 
 import (
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 const (
@@ -12,12 +12,12 @@ const (
 )
 
 type PixelDrawnEvent struct {
-	Event
+	event
 
-	UserId    user.Id
-	ProjectId project.Id
-	Color     project.Color
-	Coords    project.Vector2
+	UserId    string
+	ProjectId string
+	Color     string
+	X         string `json:"x"`
 }
 
 func NewPixelDrawnEvent(e PixelDrawnEvent) PixelDrawnEvent {
@@ -29,7 +29,7 @@ func NewPixelDrawnEvent(e PixelDrawnEvent) PixelDrawnEvent {
 }
 
 type PixelErasedEvent struct {
-	Event
+	event
 
 	UserId    user.Id
 	ProjectId project.Id

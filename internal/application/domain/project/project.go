@@ -10,9 +10,7 @@ import (
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
-type Id struct {
-	uuid.UUID
-}
+type Id uuid.UUID
 
 type Project struct {
 	Id      Id
