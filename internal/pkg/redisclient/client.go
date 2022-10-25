@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v9"
-	"github.com/rdnt/tachyon/internal/pkg/interfaces"
 )
 
 type RedisClient struct {
@@ -28,7 +27,7 @@ func New(opts Options) *RedisClient {
 	}
 }
 
-func (r *RedisClient) Publish(e interfaces.Event) error {
+func (r *RedisClient) Publish(e []byte) error {
 	b, err := json.Marshal(e)
 	if err != nil {
 		return err
@@ -49,8 +48,8 @@ func (r *RedisClient) Publish(e interfaces.Event) error {
 	return nil
 }
 
-func (r *RedisClient) Subscribe() (chan interfaces.Event, func(), error) {
-	events := make(chan interfaces.Event)
+func (r *RedisClient) Subscribe() (chan []byte, func(), error) {
+	events := make(chan []byte)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -97,13 +96,13 @@ func (r *RedisClient) Subscribe() (chan interfaces.Event, func(), error) {
 	return events, dispose, nil
 }
 
-func (r *RedisClient) Events() ([]interfaces.Event, error) {
+func (r *RedisClient) Events() ([][]byte, error) {
 	msgs, err := r.client.XRange(context.Background(), r.streamKey, "-", "+").Result()
 	if err != nil {
 		return nil, err
 	}
 
-	events := make([]interfaces.Event, 0, len(msgs))
+	events := make([][]byte, 0, len(msgs))
 	for _, msg := range msgs {
 		e, err := r.parseEvent(msg)
 		if err != nil {
@@ -117,7 +116,7 @@ func (r *RedisClient) Events() ([]interfaces.Event, error) {
 	return events, nil
 }
 
-func (r *RedisClient) parseEvent(msg redis.XMessage) (interfaces.Event, error) {
+func (r *RedisClient) parseEvent(msg redis.XMessage) ([]byte, error) {
 	evt, ok := msg.Values["event"]
 	if !ok {
 		return nil, errors.New("event value does not exist")
@@ -128,11 +127,5 @@ func (r *RedisClient) parseEvent(msg redis.XMessage) (interfaces.Event, error) {
 		return nil, errors.New("event not a string")
 	}
 
-	var e interfaces.Event
-	err := json.Unmarshal([]byte(str), &e)
-	if err != nil {
-		return nil, err
-	}
-
-	return e, nil
+	return []byte(str), nil
 }

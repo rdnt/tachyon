@@ -1,12 +1,14 @@
 package session
 
 import (
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
-type Id uuid.UUID
+type Id struct {
+	uuid.UUID
+}
 
 type Session struct {
 	Id        Id

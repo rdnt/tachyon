@@ -6,11 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
-type Id uuid.UUID
+type Id struct {
+	uuid.UUID
+}
 
 type Project struct {
 	Id      Id

@@ -3,13 +3,11 @@ package user
 import (
 	"fmt"
 
-	"github.com/google/uuid"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
-type Id uuid.UUID
-
-func (id Id) String() string {
-	return uuid.UUID(id).String()
+type Id struct {
+	uuid.UUID
 }
 
 type User struct {

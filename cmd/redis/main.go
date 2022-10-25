@@ -24,7 +24,6 @@ func main() {
 		StreamKey: "events",
 	})
 
-	// rc.Publish("hello :D")
 	events, dispose, err := rc.Subscribe()
 	if err != nil {
 		panic(err)
