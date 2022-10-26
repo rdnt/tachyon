@@ -9,10 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
-type Id uuid.UUID
-
 type Path struct {
-	Id     Id
+	Id     uuid.UUID
 	Tool   Tool
 	Color  Color
 	Points []Vector2
@@ -50,7 +48,7 @@ func ColorFromString(s string) (c Color, err error) {
 	}, nil
 }
 
-func New(id Id, tool Tool, color Color, points []Vector2) Path {
+func New(id uuid.UUID, tool Tool, color Color, points []Vector2) Path {
 	return Path{
 		Id:     id,
 		Tool:   tool,

@@ -7,44 +7,45 @@ import (
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 type EventStore interface {
-	Publish(event event.EventIface) error
+	Publish(event event.Event) error
 }
 
 type EventBus interface {
-	Publish(event event.EventIface) error
+	Publish(event event.Event) error
 }
 
 var ErrSessionNotFound = errors.New("session not found")
 
 type SessionRepository interface {
-	Session(id session.Id) (session.Session, error)
-	ProjectSessionByName(pid project.Id, name string) (session.Session, error)
-	ProjectSessions(pid project.Id) ([]session.Session, error)
+	Session(id uuid.UUID) (session.Session, error)
+	ProjectSessionByName(pid uuid.UUID, name string) (session.Session, error)
+	ProjectSessions(pid uuid.UUID) ([]session.Session, error)
 }
 
 var ErrProjectNotFound = errors.New("project not found")
 
 type ProjectRepository interface {
-	Project(id project.Id) (project.Project, error)
-	UserProjectByName(userId user.Id, name string) (project.Project, error)
+	Project(id uuid.UUID) (project.Project, error)
+	UserProjectByName(userId uuid.UUID, name string) (project.Project, error)
 }
 
 var ErrUserNotFound = errors.New("user not found")
 
 type UserRepository interface {
-	User(id user.Id) (user.User, error)
+	User(id uuid.UUID) (user.User, error)
 	UserByName(name string) (user.User, error)
 }
 
 type Service interface {
-	CreateUser(id user.Id, name string) error
-	CreateProject(id project.Id, name string, ownerId user.Id) error
-	CreateSession(id session.Id, name string, projectId project.Id) error
-	JoinSession(id session.Id, uid user.Id) error
-	LeaveSession(id session.Id, uid user.Id) error
+	CreateUser(id uuid.UUID, name string) error
+	CreateProject(id uuid.UUID, name string, ownerId uuid.UUID) error
+	CreateSession(id uuid.UUID, name string, projectId uuid.UUID) error
+	JoinSession(id uuid.UUID, uid uuid.UUID) error
+	LeaveSession(id uuid.UUID, uid uuid.UUID) error
 
 	CreatePath(args CreatePathArgs) error
 
@@ -60,7 +61,7 @@ type service struct {
 	bus      EventBus
 }
 
-func (s *service) publish(e event.EventIface) error {
+func (s *service) publish(e event.Event) error {
 	err := s.store.Publish(e)
 	if err != nil {
 		return err

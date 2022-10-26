@@ -12,10 +12,10 @@ type Session struct {
 	session.Session
 }
 
-func (s *Session) ProcessEvent(e event.EventIface) {
+func (s *Session) ProcessEvent(e event.Event) {
 	switch e := e.(type) {
 	case event.SessionCreatedEvent:
-		s.Id = e.Id
+		s.Id = e.SessionId
 		s.Name = e.Name
 		s.ProjectId = e.ProjectId
 		s.UserIds = e.UserIds

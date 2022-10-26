@@ -4,18 +4,15 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/google/uuid"
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"gotest.tools/assert"
 )
 
 func TestTachyon(t *testing.T) {
 	s := newSuite(t)
 
-	uid := user.Id(uuid.New())
+	uid := uuid.New()
 	t.Run("create user", func(t *testing.T) {
 		name := "test user"
 		err := s.commands.CreateUser(uid, name)
@@ -32,7 +29,7 @@ func TestTachyon(t *testing.T) {
 		})
 	})
 
-	pid := project.Id(uuid.New())
+	pid := uuid.New()
 	t.Run("create project", func(t *testing.T) {
 		name := "first project"
 		err := s.commands.CreateProject(pid, name, uid)
@@ -51,13 +48,13 @@ func TestTachyon(t *testing.T) {
 		assert.Equal(t, p.OwnerId, uid)
 
 		t.Run("this user can't create project with the same name", func(t *testing.T) {
-			pid := project.Id(uuid.New())
+			pid := uuid.New()
 			err := s.commands.CreateProject(pid, name, uid)
 			assert.Assert(t, err != nil)
 		})
 	})
 
-	sid := session.Id(uuid.New())
+	sid := uuid.New()
 	t.Run("create session", func(t *testing.T) {
 		name := "first session"
 		err := s.commands.CreateSession(sid, name, pid)
@@ -82,7 +79,7 @@ func TestTachyon(t *testing.T) {
 		})
 
 		t.Run("project can't have session with the same name", func(t *testing.T) {
-			sid := session.Id(uuid.New())
+			sid := uuid.New()
 			err := s.commands.CreateSession(sid, name, pid)
 			assert.Assert(t, err != nil)
 		})

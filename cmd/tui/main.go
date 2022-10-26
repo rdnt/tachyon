@@ -11,8 +11,6 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/query"
 	projectview "github.com/rdnt/tachyon/internal/application/query/project_repository"
 	"github.com/rdnt/tachyon/internal/event_store"
@@ -62,10 +60,10 @@ func main() {
 		projectView,
 	)
 
-	uid := user.Id(uuid.Nil)
+	uid := uuid.UUID(uuid.Nil)
 	err = commands.CreateUser(uid, "user-1")
 
-	pid := project.Id(uuid.Nil)
+	pid := uuid.UUID(uuid.Nil)
 	err = commands.CreateProject(pid, "project-1", uid)
 
 	m := &model{

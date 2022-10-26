@@ -1,16 +1,14 @@
 package application
 
 import (
-	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 )
 
 type Commands interface {
-	CreateSession(userId user.Id, projectId project.Id, sessionName string) error
-	JoinSession(userId user.Id, sessionId session.Id) error
+	CreateSession(userId uuid.UUID, projectId uuid.UUID, sessionName string) error
+	JoinSession(userId uuid.UUID, sessionId uuid.UUID) error
 }
 
 type Queries interface {
-	Session(id session.Id) (session.Session, error)
+	Session(id uuid.UUID) (session.Session, error)
 }

@@ -5,13 +5,14 @@ import (
 	"errors"
 
 	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 type View struct {
-	users map[user.Id]user.User
+	users map[uuid.UUID]user.User
 }
 
-func (v *View) User(id user.Id) (user.User, error) {
+func (v *View) User(id uuid.UUID) (user.User, error) {
 	u, ok := v.users[id]
 	if !ok {
 		return user.User{}, errors.New("not found")
@@ -36,7 +37,7 @@ func (v *View) String() string {
 
 func New() *View {
 	r := &View{
-		users: map[user.Id]user.User{},
+		users: map[uuid.UUID]user.User{},
 	}
 
 	return r

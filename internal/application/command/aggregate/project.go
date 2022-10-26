@@ -12,10 +12,10 @@ type Project struct {
 	project.Project
 }
 
-func (p *Project) ProcessEvent(e event.EventIface) {
+func (p *Project) ProcessEvent(e event.Event) {
 	switch e := e.(type) {
 	case event.ProjectCreatedEvent:
-		p.Id = e.Id
+		p.Id = e.ProjectId
 		p.Name = e.Name
 		p.OwnerId = e.OwnerId
 	case event.PixelDrawnEvent:

@@ -1,8 +1,6 @@
 package event
 
 import (
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
@@ -11,17 +9,19 @@ const (
 )
 
 type ProjectCreatedEvent struct {
-	event
-
-	Id      project.Id
-	OwnerId user.Id
-	Name    string
+	ProjectId uuid.UUID
+	OwnerId   uuid.UUID
+	Name      string
 }
 
-func NewProjectCreatedEvent(e ProjectCreatedEvent) ProjectCreatedEvent {
-	e.typ = ProjectCreated
-	e.aggregateType = Project
-	e.aggregateId = uuid.UUID(e.Id)
+func (ProjectCreatedEvent) Type() Type {
+	return ProjectCreated
+}
 
-	return e
+func (ProjectCreatedEvent) AggregateType() AggregateType {
+	return Project
+}
+
+func (e ProjectCreatedEvent) AggregateId() uuid.UUID {
+	return e.ProjectId
 }

@@ -6,10 +6,8 @@ import (
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
-type Id uuid.UUID
-
 type User struct {
-	Id   Id
+	Id   uuid.UUID
 	Name string
 }
 

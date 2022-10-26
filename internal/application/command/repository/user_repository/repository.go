@@ -8,21 +8,22 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command/aggregate"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 type EventStore interface {
-	Events() ([]event.EventIface, error)
-	Subscribe(h func(e event.EventIface)) (dispose func(), err error)
+	Events() ([]event.Event, error)
+	Subscribe(h func(e event.Event)) (dispose func(), err error)
 }
 
 type Repo struct {
 	store   EventStore
 	mux     sync.Mutex
-	users   map[user.Id]*aggregate.User
+	users   map[uuid.UUID]*aggregate.User
 	dispose func()
 }
 
-func (r *Repo) User(id user.Id) (user.User, error) {
+func (r *Repo) User(id uuid.UUID) (user.User, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -51,7 +52,7 @@ func (r *Repo) String() string {
 	return fmt.Sprint(r.users)
 }
 
-func (r *Repo) processEvents(events ...event.EventIface) {
+func (r *Repo) processEvents(events ...event.Event) {
 	r.mux.Lock()
 
 	for _, e := range events {
@@ -59,12 +60,12 @@ func (r *Repo) processEvents(events ...event.EventIface) {
 			continue
 		}
 
-		_, ok := r.users[user.Id(e.AggregateId())]
+		_, ok := r.users[uuid.UUID(e.AggregateId())]
 		if !ok {
-			r.users[user.Id(e.AggregateId())] = &aggregate.User{}
+			r.users[uuid.UUID(e.AggregateId())] = &aggregate.User{}
 		}
 
-		r.users[user.Id(e.AggregateId())].ProcessEvent(e)
+		r.users[uuid.UUID(e.AggregateId())].ProcessEvent(e)
 	}
 
 	r.mux.Unlock()
@@ -73,7 +74,7 @@ func (r *Repo) processEvents(events ...event.EventIface) {
 func New(store EventStore) (*Repo, error) {
 	r := &Repo{
 		store: store,
-		users: map[user.Id]*aggregate.User{},
+		users: map[uuid.UUID]*aggregate.User{},
 	}
 
 	events, err := store.Events()
@@ -83,7 +84,7 @@ func New(store EventStore) (*Repo, error) {
 
 	r.processEvents(events...)
 
-	dispose, err := store.Subscribe(func(e event.EventIface) {
+	dispose, err := store.Subscribe(func(e event.Event) {
 		r.processEvents(e)
 	})
 	if err != nil {

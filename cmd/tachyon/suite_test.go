@@ -30,7 +30,7 @@ type suite struct {
 }
 
 func newSuite(t *testing.T) *suite {
-	eventBus := event_bus.New(fanout.New[event.event]())
+	eventBus := event_bus.New(fanout.New[event.Event]())
 
 	eventStore := event_store.New()
 

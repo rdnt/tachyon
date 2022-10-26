@@ -6,24 +6,24 @@ import (
 
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/command/aggregate"
-	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 type EventStore interface {
-	Events() ([]event.EventIface, error)
-	Subscribe(h func(e event.EventIface)) (dispose func(), err error)
+	Events() ([]event.Event, error)
+	Subscribe(h func(e event.Event)) (dispose func(), err error)
 }
 
 type Repo struct {
 	store    EventStore
 	mux      sync.Mutex
-	sessions map[session.Id]*aggregate.Session
+	sessions map[uuid.UUID]*aggregate.Session
 	dispose  func()
 }
 
-func (r *Repo) Session(id session.Id) (session.Session, error) {
+func (r *Repo) Session(id uuid.UUID) (session.Session, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -35,7 +35,7 @@ func (r *Repo) Session(id session.Id) (session.Session, error) {
 	return s.Session, nil
 }
 
-func (r *Repo) ProjectSessionByName(pid project.Id, name string) (session.Session, error) {
+func (r *Repo) ProjectSessionByName(pid uuid.UUID, name string) (session.Session, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -48,7 +48,7 @@ func (r *Repo) ProjectSessionByName(pid project.Id, name string) (session.Sessio
 	return session.Session{}, command.ErrSessionNotFound
 }
 
-func (r *Repo) ProjectSessions(pid project.Id) ([]session.Session, error) {
+func (r *Repo) ProjectSessions(pid uuid.UUID) ([]session.Session, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -66,7 +66,7 @@ func (r *Repo) String() string {
 	return fmt.Sprint(r.sessions)
 }
 
-func (r *Repo) processEvents(events ...event.EventIface) {
+func (r *Repo) processEvents(events ...event.Event) {
 	r.mux.Lock()
 
 	for _, e := range events {
@@ -74,12 +74,12 @@ func (r *Repo) processEvents(events ...event.EventIface) {
 			continue
 		}
 
-		_, ok := r.sessions[session.Id(e.AggregateId())]
+		_, ok := r.sessions[uuid.UUID(e.AggregateId())]
 		if !ok {
-			r.sessions[session.Id(e.AggregateId())] = &aggregate.Session{}
+			r.sessions[uuid.UUID(e.AggregateId())] = &aggregate.Session{}
 		}
 
-		r.sessions[session.Id(e.AggregateId())].ProcessEvent(e)
+		r.sessions[uuid.UUID(e.AggregateId())].ProcessEvent(e)
 	}
 
 	r.mux.Unlock()
@@ -88,7 +88,7 @@ func (r *Repo) processEvents(events ...event.EventIface) {
 func New(store EventStore) (*Repo, error) {
 	r := &Repo{
 		store:    store,
-		sessions: map[session.Id]*aggregate.Session{},
+		sessions: map[uuid.UUID]*aggregate.Session{},
 	}
 
 	events, err := store.Events()
@@ -98,7 +98,7 @@ func New(store EventStore) (*Repo, error) {
 
 	r.processEvents(events...)
 
-	dispose, err := store.Subscribe(func(e event.EventIface) {
+	dispose, err := store.Subscribe(func(e event.Event) {
 		r.processEvents(e)
 	})
 	if err != nil {

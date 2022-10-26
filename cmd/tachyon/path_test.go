@@ -3,30 +3,28 @@ package main_test
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/project/path"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"gotest.tools/assert"
 )
 
 func TestPath(t *testing.T) {
 	s := newSuite(t)
 
-	uid := user.Id(uuid.New())
+	uid := uuid.New()
 	t.Run("create user", func(t *testing.T) {
 		err := s.commands.CreateUser(uid, "user-1")
 		assert.NilError(t, err)
 	})
 
-	pid := project.Id(uuid.New())
+	pid := uuid.New()
 	t.Run("create project", func(t *testing.T) {
 		err := s.commands.CreateProject(pid, "project-1", uid)
 		assert.NilError(t, err)
 	})
 
-	pathId := path.Id(uuid.New())
+	pathId := uuid.New()
 	t.Run("create path", func(t *testing.T) {
 		tool := path.Pen
 

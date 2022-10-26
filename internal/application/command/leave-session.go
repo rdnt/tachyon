@@ -3,13 +3,12 @@ package command
 import (
 	"fmt"
 
-	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 )
 
-func (s *service) LeaveSession(id session.Id, uid user.Id) error {
+func (s *service) LeaveSession(id uuid.UUID, uid uuid.UUID) error {
 	_, err := s.users.User(uid)
 	if err != nil {
 		return err
@@ -25,10 +24,10 @@ func (s *service) LeaveSession(id session.Id, uid user.Id) error {
 		return fmt.Errorf("cannot remove user from session: not a member")
 	}
 
-	e := event.NewLeftSessionEvent(event.LeftSessionEvent{
+	e := event.LeftSessionEvent{
 		SessionId: sess.Id,
 		UserId:    uid,
-	})
+	}
 
 	err = s.publish(e)
 	if err != nil {

@@ -2,12 +2,13 @@ package redisclient
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/go-redis/redis/v9"
+	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/pkg/redisclient/redisevent"
 )
 
 type RedisClient struct {
@@ -27,8 +28,15 @@ func New(opts Options) *RedisClient {
 	}
 }
 
-func (r *RedisClient) Publish(e []byte) error {
-	b, err := json.Marshal(e)
+//type jsonEvent struct {
+//	Type          string           `json:"type"`
+//	AggregateType string           `json:"aggregateType"`
+//	AggregateId   string           `json:"aggregateId"`
+//	Data          interfaces.Event `json:"data"`
+//}
+
+func (r *RedisClient) Publish(e event.Event) error {
+	b, err := redisevent.EventToJSON(e)
 	if err != nil {
 		return err
 	}
@@ -38,6 +46,9 @@ func (r *RedisClient) Publish(e []byte) error {
 		MaxLen: 0,
 		ID:     "*",
 		Values: map[string]interface{}{
+			"type": e.Type().String(),
+			//"aggregateType": string(e.AggregateType()),
+			//"aggregateId":   e.AggregateId().String(),
 			"event": string(b),
 		},
 	}).Err()
@@ -48,8 +59,8 @@ func (r *RedisClient) Publish(e []byte) error {
 	return nil
 }
 
-func (r *RedisClient) Subscribe() (chan []byte, func(), error) {
-	events := make(chan []byte)
+func (r *RedisClient) Subscribe() (chan event.Event, func(), error) {
+	events := make(chan event.Event)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -96,13 +107,13 @@ func (r *RedisClient) Subscribe() (chan []byte, func(), error) {
 	return events, dispose, nil
 }
 
-func (r *RedisClient) Events() ([][]byte, error) {
+func (r *RedisClient) Events() ([]event.Event, error) {
 	msgs, err := r.client.XRange(context.Background(), r.streamKey, "-", "+").Result()
 	if err != nil {
 		return nil, err
 	}
 
-	events := make([][]byte, 0, len(msgs))
+	events := make([]event.Event, 0, len(msgs))
 	for _, msg := range msgs {
 		e, err := r.parseEvent(msg)
 		if err != nil {
@@ -116,16 +127,31 @@ func (r *RedisClient) Events() ([][]byte, error) {
 	return events, nil
 }
 
-func (r *RedisClient) parseEvent(msg redis.XMessage) ([]byte, error) {
-	evt, ok := msg.Values["event"]
+func (r *RedisClient) parseEvent(msg redis.XMessage) (event.Event, error) {
+	val, ok := msg.Values["event"]
 	if !ok {
 		return nil, errors.New("event value does not exist")
 	}
 
-	str, ok := evt.(string)
+	str, ok := val.(string)
 	if !ok {
 		return nil, errors.New("event not a string")
 	}
 
-	return []byte(str), nil
+	v2, ok := msg.Values["type"]
+	if !ok {
+		return nil, errors.New("event value does not exist")
+	}
+
+	s2, ok := v2.(string)
+	if !ok {
+		return nil, errors.New("event not a string")
+	}
+
+	typ, err := event.TypeFromString(s2)
+	if err != nil {
+		return nil, err
+	}
+
+	return redisevent.EventFromJSON(typ, []byte(str))
 }

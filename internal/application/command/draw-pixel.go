@@ -4,14 +4,14 @@ import (
 	"errors"
 
 	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 )
 
 type DrawPixelArgs struct {
-	UserId    user.Id
-	ProjectId project.Id
+	UserId    uuid.UUID
+	ProjectId uuid.UUID
 	Color     project.Color
 	Coords    project.Vector2
 }
@@ -39,12 +39,12 @@ func (s *service) DrawPixel(args DrawPixelArgs) error {
 		return errors.New("user doesn't have access to the project")
 	}
 
-	e := event.NewPixelDrawnEvent(event.PixelDrawnEvent{
+	e := event.PixelDrawnEvent{
 		UserId:    args.UserId,
 		ProjectId: proj.Id,
 		Color:     args.Color,
 		Coords:    args.Coords,
-	})
+	}
 
 	err = s.publish(e)
 	if err != nil {

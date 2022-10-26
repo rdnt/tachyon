@@ -2,7 +2,6 @@ package event
 
 import (
 	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
@@ -12,34 +11,38 @@ const (
 )
 
 type PixelDrawnEvent struct {
-	event
-
-	UserId    string
-	ProjectId string
-	Color     string
-	X         string `json:"x"`
-}
-
-func NewPixelDrawnEvent(e PixelDrawnEvent) PixelDrawnEvent {
-	e.typ = PixelDrawn
-	e.aggregateType = Project
-	e.aggregateId = uuid.UUID(e.ProjectId)
-
-	return e
-}
-
-type PixelErasedEvent struct {
-	event
-
-	UserId    user.Id
-	ProjectId project.Id
+	UserId    uuid.UUID
+	ProjectId uuid.UUID
+	Color     project.Color
 	Coords    project.Vector2
 }
 
-func NewPixelErasedEvent(e PixelErasedEvent) PixelErasedEvent {
-	e.typ = PixelErased
-	e.aggregateType = Project
-	e.aggregateId = uuid.UUID(e.ProjectId)
+func (PixelDrawnEvent) Type() Type {
+	return PixelDrawn
+}
 
-	return e
+func (PixelDrawnEvent) AggregateType() AggregateType {
+	return Project
+}
+
+func (e PixelDrawnEvent) AggregateId() uuid.UUID {
+	return e.ProjectId
+}
+
+type PixelErasedEvent struct {
+	UserId    uuid.UUID
+	ProjectId uuid.UUID
+	Coords    project.Vector2
+}
+
+func (PixelErasedEvent) Type() Type {
+	return PixelErased
+}
+
+func (PixelErasedEvent) AggregateType() AggregateType {
+	return Project
+}
+
+func (e PixelErasedEvent) AggregateId() uuid.UUID {
+	return e.ProjectId
 }

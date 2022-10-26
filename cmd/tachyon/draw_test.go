@@ -4,10 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 	"gotest.tools/assert"
 )
@@ -15,13 +14,13 @@ import (
 func TestDrawPixel(t *testing.T) {
 	s := newSuite(t)
 
-	uid := user.Id(uuid.New())
+	uid := uuid.New()
 	t.Run("create user", func(t *testing.T) {
 		err := s.commands.CreateUser(uid, "user-1")
 		assert.NilError(t, err)
 	})
 
-	pid := project.Id(uuid.New())
+	pid := uuid.New()
 	t.Run("create project", func(t *testing.T) {
 		err := s.commands.CreateProject(pid, "project-1", uid)
 		assert.NilError(t, err)

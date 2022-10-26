@@ -9,7 +9,6 @@ import (
 	gookitcolor "github.com/gookit/color"
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/query"
 )
 
@@ -18,8 +17,8 @@ type model struct {
 	height    int
 	commands  command.Service
 	queries   query.Service
-	userId    user.Id
-	projectId project.Id
+	userId    uuid.UUID
+	projectId uuid.UUID
 }
 
 func (m *model) Init() tea.Cmd {

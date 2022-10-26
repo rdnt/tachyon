@@ -3,17 +3,16 @@ package command
 import (
 	"errors"
 
-	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/project/path"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 )
 
 type CreatePathArgs struct {
-	PathId    path.Id
-	UserId    user.Id
-	ProjectId project.Id
+	PathId    uuid.UUID
+	UserId    uuid.UUID
+	ProjectId uuid.UUID
 	Tool      path.Tool
 	Color     path.Color
 	Point     path.Vector2
@@ -42,14 +41,14 @@ func (s *service) CreatePath(args CreatePathArgs) error {
 		return errors.New("user doesn't have access to the project")
 	}
 
-	e := event.NewPathCreatedEvent(event.PathCreatedEvent{
+	e := event.PathCreatedEvent{
 		PathId:    args.PathId,
 		UserId:    args.UserId,
 		ProjectId: proj.Id,
 		Tool:      args.Tool,
 		Color:     args.Color,
 		Point:     args.Point,
-	})
+	}
 
 	err = s.publish(e)
 	if err != nil {

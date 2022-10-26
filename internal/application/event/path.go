@@ -1,9 +1,7 @@
 package event
 
 import (
-	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/domain/project/path"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
@@ -12,20 +10,22 @@ const (
 )
 
 type PathCreatedEvent struct {
-	event
-
-	PathId    path.Id
-	UserId    user.Id
-	ProjectId project.Id
+	PathId    uuid.UUID
+	UserId    uuid.UUID
+	ProjectId uuid.UUID
 	Tool      path.Tool
 	Color     path.Color
 	Point     path.Vector2
 }
 
-func NewPathCreatedEvent(e PathCreatedEvent) PathCreatedEvent {
-	e.typ = PathCreated
-	e.aggregateType = Project
-	e.aggregateId = uuid.UUID(e.ProjectId)
+func (PathCreatedEvent) Type() Type {
+	return PathCreated
+}
 
-	return e
+func (PathCreatedEvent) AggregateType() AggregateType {
+	return Project
+}
+
+func (e PathCreatedEvent) AggregateId() uuid.UUID {
+	return uuid.UUID(e.ProjectId)
 }

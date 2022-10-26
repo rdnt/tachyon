@@ -4,11 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/google/uuid"
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 	"gotest.tools/assert"
 )
@@ -16,8 +13,8 @@ import (
 func TestSessions(t *testing.T) {
 	s := newSuite(t)
 
-	uid1 := user.Id(uuid.New())
-	uid2 := user.Id(uuid.New())
+	uid1 := uuid.New()
+	uid2 := uuid.New()
 
 	t.Run("create users", func(t *testing.T) {
 		err := s.commands.CreateUser(uid1, "user-1")
@@ -27,14 +24,14 @@ func TestSessions(t *testing.T) {
 		assert.NilError(t, err)
 	})
 
-	pid := project.Id(uuid.New())
+	pid := uuid.New()
 
 	t.Run("create project", func(t *testing.T) {
 		err := s.commands.CreateProject(pid, "project-1", uid1)
 		assert.NilError(t, err)
 	})
 
-	sid := session.Id(uuid.New())
+	sid := uuid.New()
 
 	t.Run("create session", func(t *testing.T) {
 		err := s.commands.CreateSession(sid, "session-1", pid)

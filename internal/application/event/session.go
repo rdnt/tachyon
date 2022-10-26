@@ -1,9 +1,6 @@
 package event
 
 import (
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
@@ -14,48 +11,54 @@ const (
 )
 
 type SessionCreatedEvent struct {
-	event
-
-	ProjectId project.Id
-	Id        session.Id
+	ProjectId uuid.UUID
+	SessionId uuid.UUID
 	Name      string
-	UserIds   []user.Id
+	UserIds   []uuid.UUID
 }
 
-func NewSessionCreatedEvent(e SessionCreatedEvent) SessionCreatedEvent {
-	e.typ = SessionCreated
-	e.aggregateType = Session
-	e.aggregateId = uuid.UUID(e.Id)
+func (SessionCreatedEvent) Type() Type {
+	return SessionCreated
+}
 
-	return e
+func (SessionCreatedEvent) AggregateType() AggregateType {
+	return Session
+}
+
+func (e SessionCreatedEvent) AggregateId() uuid.UUID {
+	return e.SessionId
 }
 
 type JoinedSessionEvent struct {
-	event
-
-	SessionId session.Id
-	UserId    user.Id
+	SessionId uuid.UUID
+	UserId    uuid.UUID
 }
 
-func NewJoinedSessionEvent(e JoinedSessionEvent) JoinedSessionEvent {
-	e.typ = JoinedSession
-	e.aggregateType = Session
-	e.aggregateId = uuid.UUID(e.SessionId)
+func (JoinedSessionEvent) Type() Type {
+	return JoinedSession
+}
 
-	return e
+func (JoinedSessionEvent) AggregateType() AggregateType {
+	return Session
+}
+
+func (e JoinedSessionEvent) AggregateId() uuid.UUID {
+	return e.SessionId
 }
 
 type LeftSessionEvent struct {
-	event
-
-	SessionId session.Id
-	UserId    user.Id
+	SessionId uuid.UUID
+	UserId    uuid.UUID
 }
 
-func NewLeftSessionEvent(e LeftSessionEvent) LeftSessionEvent {
-	e.typ = LeftSession
-	e.aggregateType = Session
-	e.aggregateId = uuid.UUID(e.SessionId)
+func (LeftSessionEvent) Type() Type {
+	return LeftSession
+}
 
-	return e
+func (LeftSessionEvent) AggregateType() AggregateType {
+	return Session
+}
+
+func (e LeftSessionEvent) AggregateId() uuid.UUID {
+	return e.SessionId
 }

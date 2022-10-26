@@ -3,13 +3,12 @@ package command
 import (
 	"errors"
 
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 func (s *service) CreateProject(
-	id project.Id, name string, ownerId user.Id,
+	id uuid.UUID, name string, ownerId uuid.UUID,
 ) error {
 	u, err := s.users.User(ownerId)
 	if err != nil {
@@ -23,11 +22,11 @@ func (s *service) CreateProject(
 		return err
 	}
 
-	e := event.NewProjectCreatedEvent(event.ProjectCreatedEvent{
-		Id:      id,
-		Name:    name,
-		OwnerId: u.Id,
-	})
+	e := event.ProjectCreatedEvent{
+		ProjectId: id,
+		Name:      name,
+		OwnerId:   u.Id,
+	}
 
 	err = s.publish(e)
 	if err != nil {

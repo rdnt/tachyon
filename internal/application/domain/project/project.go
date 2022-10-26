@@ -6,16 +6,13 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
-type Id uuid.UUID
-
 type Project struct {
-	Id      Id
+	Id      uuid.UUID
 	Name    string
-	OwnerId user.Id
+	OwnerId uuid.UUID
 	Pixels  []Pixel
 }
 
@@ -49,7 +46,7 @@ type Vector2 struct {
 	Y int
 }
 
-func New(id Id, ownerId user.Id, name string) Project {
+func New(id uuid.UUID, ownerId uuid.UUID, name string) Project {
 	return Project{
 		Id:      id,
 		Name:    name,

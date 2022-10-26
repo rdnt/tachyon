@@ -7,7 +7,6 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/command/aggregate"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
 )
 
@@ -18,11 +17,11 @@ type EventBus interface {
 type Repo struct {
 	bus      EventBus
 	mux      sync.Mutex
-	projects map[project.Id]*aggregate.Project
+	projects map[uuid.UUID]*aggregate.Project
 	dispose  func()
 }
 
-func (r *Repo) Project(id project.Id) (project.Project, error) {
+func (r *Repo) Project(id uuid.UUID) (project.Project, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -34,7 +33,7 @@ func (r *Repo) Project(id project.Id) (project.Project, error) {
 	return p.Project, nil
 }
 
-func (r *Repo) UserProjectByName(uid user.Id, name string) (project.Project, error) {
+func (r *Repo) UserProjectByName(uid uuid.UUID, name string) (project.Project, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
@@ -59,12 +58,12 @@ func (r *Repo) processEvents(events ...event.EventIface) {
 			continue
 		}
 
-		_, ok := r.projects[project.Id(e.AggregateId())]
+		_, ok := r.projects[uuid.UUID(e.AggregateId())]
 		if !ok {
-			r.projects[project.Id(e.AggregateId())] = &aggregate.Project{}
+			r.projects[uuid.UUID(e.AggregateId())] = &aggregate.Project{}
 		}
 
-		r.projects[project.Id(e.AggregateId())].ProcessEvent(e)
+		r.projects[uuid.UUID(e.AggregateId())].ProcessEvent(e)
 	}
 
 	r.mux.Unlock()
@@ -73,7 +72,7 @@ func (r *Repo) processEvents(events ...event.EventIface) {
 func New(bus EventBus) (*Repo, error) {
 	r := &Repo{
 		bus:      bus,
-		projects: map[project.Id]*aggregate.Project{},
+		projects: map[uuid.UUID]*aggregate.Project{},
 	}
 
 	events, err := bus.Subscribe()

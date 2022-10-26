@@ -4,14 +4,14 @@ import (
 	"errors"
 
 	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 )
 
 type ErasePixelArgs struct {
-	UserId    user.Id
-	ProjectId project.Id
+	UserId    uuid.UUID
+	ProjectId uuid.UUID
 	Coords    project.Vector2
 }
 
@@ -48,11 +48,11 @@ func (s *service) ErasePixel(args ErasePixelArgs) error {
 	//	}
 	//}
 
-	e := event.NewPixelErasedEvent(event.PixelErasedEvent{
+	e := event.PixelErasedEvent{
 		UserId:    args.UserId,
 		ProjectId: proj.Id,
 		Coords:    args.Coords,
-	})
+	}
 
 	err = s.publish(e)
 	if err != nil {

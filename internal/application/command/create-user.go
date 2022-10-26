@@ -3,16 +3,16 @@ package command
 import (
 	"errors"
 
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 type CreateUserParams struct {
-	Id   user.Id
+	Id   uuid.UUID
 	Name string
 }
 
-func (s *service) CreateUser(id user.Id, name string) error {
+func (s *service) CreateUser(id uuid.UUID, name string) error {
 	_, err := s.users.UserByName(name)
 	if err == nil {
 		return errors.New("user already exists")
@@ -20,10 +20,10 @@ func (s *service) CreateUser(id user.Id, name string) error {
 		return err
 	}
 
-	e := event.NewUserCreatedEvent(event.UserCreatedEvent{
-		Id:   id,
-		Name: name,
-	})
+	e := event.UserCreatedEvent{
+		UserId: id,
+		Name:   name,
+	}
 
 	err = s.publish(e)
 	if err != nil {

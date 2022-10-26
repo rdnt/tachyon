@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v9"
+	"github.com/rdnt/tachyon/internal/application/domain/project"
+	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/internal/pkg/redisclient"
 )
 
@@ -38,17 +40,12 @@ func main() {
 
 	go func() {
 		time.Sleep(1 * time.Second)
-		err := rc.Publish("test")
-		if err != nil {
-			panic(err)
-		}
-		time.Sleep(10 * time.Millisecond)
-		err = rc.Publish("test")
-		if err != nil {
-			panic(err)
-		}
-		time.Sleep(10 * time.Millisecond)
-		err = rc.Publish("test")
+		err := rc.Publish(event.NewPixelDrawnEvent(event.PixelDrawnEvent{
+			UserId:    uuid.UUID{},
+			ProjectId: uuid.UUID{},
+			Color:     project.Color{},
+			Coords:    project.Vector2{},
+		}))
 		if err != nil {
 			panic(err)
 		}
@@ -56,11 +53,6 @@ func main() {
 
 		fmt.Println(rc.Events())
 		time.Sleep(1 * time.Second)
-
-		err = rc.Publish("test")
-		if err != nil {
-			panic(err)
-		}
 
 		fmt.Println(rc.Events())
 	}()

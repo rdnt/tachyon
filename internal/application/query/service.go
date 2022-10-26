@@ -5,32 +5,33 @@ import (
 	"github.com/rdnt/tachyon/internal/application/domain/session"
 	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 type EventBus interface {
-	Subscribe() (chan event.EventIface, error)
+	Subscribe() (chan event.Event, error)
 }
 
 type SessionView interface {
-	Session(id session.Id) (session.Session, error)
+	Session(id uuid.UUID) (session.Session, error)
 	//CreateSession(s session.Session) error
 	//UpdateSession(s session.Session) error
 }
 
 type UserView interface {
-	User(id user.Id) (user.User, error)
+	User(id uuid.UUID) (user.User, error)
 	//CreateUser(u user.User) error
 }
 
 type ProjectView interface {
-	Project(id project.Id) (project.Project, error)
+	Project(id uuid.UUID) (project.Project, error)
 	//CreateUser(u user.User) error
 }
 
 type Service interface {
-	Session(id session.Id) (session.Session, error)
-	User(id user.Id) (user.User, error)
-	Project(id project.Id) (project.Project, error)
+	Session(id uuid.UUID) (session.Session, error)
+	User(id uuid.UUID) (user.User, error)
+	Project(id uuid.UUID) (project.Project, error)
 }
 
 type service struct {
@@ -40,15 +41,15 @@ type service struct {
 	projects ProjectView
 }
 
-func (s *service) Session(id session.Id) (session.Session, error) {
+func (s *service) Session(id uuid.UUID) (session.Session, error) {
 	return s.sessions.Session(id)
 }
 
-func (s *service) User(id user.Id) (user.User, error) {
+func (s *service) User(id uuid.UUID) (user.User, error) {
 	return s.users.User(id)
 }
 
-func (s *service) Project(id project.Id) (project.Project, error) {
+func (s *service) Project(id uuid.UUID) (project.Project, error) {
 	return s.projects.Project(id)
 }
 

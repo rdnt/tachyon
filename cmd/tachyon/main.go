@@ -7,23 +7,22 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
+	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/internal/application/query"
 	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
 	"github.com/rdnt/tachyon/internal/application/query/view/user_view"
 	"github.com/rdnt/tachyon/internal/event_bus"
 	"github.com/rdnt/tachyon/internal/event_store"
 	"github.com/rdnt/tachyon/pkg/fanout"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 func main() {
-	eventBus := event_bus.New(fanout.New[Event]())
+	eventBus := event_bus.New(fanout.New[event.Event]())
 
 	eventStore := event_store.New()
 	sessionRepo, err := session_repository.New(eventStore)
@@ -90,12 +89,12 @@ func main() {
 				fmt.Println("users:", userView)
 			case "create user":
 				uid := uuid.New()
-				err := commandSvc.CreateUser(user.Id(uid), "user-1")
+				err := commandSvc.CreateUser(uid, "user-1")
 				if err != nil {
 					panic(err)
 				}
 
-				ru, err := userRepo.User(user.Id(uid))
+				ru, err := userRepo.User(uid)
 				if err != nil {
 					panic(err)
 				}
@@ -126,9 +125,12 @@ func main() {
 
 				fmt.Println("ownerId?")
 				input.Scan()
-				uid := uuid.MustParse(input.Text())
+				uid, err := uuid.Parse(input.Text())
+				if err != nil {
+					panic(err)
+				}
 
-				err := commandSvc.CreateProject(project.Id(pid), name, user.Id(uid))
+				err = commandSvc.CreateProject(pid, name, uid)
 				if err != nil {
 					panic(err)
 				}

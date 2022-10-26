@@ -3,14 +3,12 @@ package command
 import (
 	"errors"
 
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 func (s *service) CreateSession(
-	id session.Id, name string, projectId project.Id,
+	id uuid.UUID, name string, projectId uuid.UUID,
 ) error {
 	p, err := s.projects.Project(projectId)
 	if err != nil {
@@ -24,12 +22,12 @@ func (s *service) CreateSession(
 		return err
 	}
 
-	e := event.NewSessionCreatedEvent(event.SessionCreatedEvent{
-		Id:        id,
+	e := event.SessionCreatedEvent{
+		SessionId: id,
 		Name:      name,
 		ProjectId: projectId,
-		UserIds:   []user.Id{p.OwnerId},
-	})
+		UserIds:   []uuid.UUID{p.OwnerId},
+	}
 
 	err = s.publish(e)
 	if err != nil {

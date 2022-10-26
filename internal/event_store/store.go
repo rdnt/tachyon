@@ -3,30 +3,30 @@ package event_store
 import (
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/pkg/broker"
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"github.com/sanity-io/litter"
 )
 
 type Store struct {
 	mux    sync.Mutex
-	events []event.EventIface
-	broker *broker.Broker[event.EventIface]
+	events []event.Event
+	broker *broker.Broker[event.Event]
 }
 
-func (s *Store) Subscribe(h func(e event.EventIface)) (dispose func(), err error) {
+func (s *Store) Subscribe(h func(e event.Event)) (dispose func(), err error) {
 	return s.broker.Subscribe(h), nil
 }
 
-func (s *Store) Events() ([]event.EventIface, error) {
+func (s *Store) Events() ([]event.Event, error) {
 	s.mux.Lock()
 	defer s.mux.Unlock()
 
 	return s.events, nil
 }
 
-func (s *Store) Publish(e event.EventIface) error {
+func (s *Store) Publish(e event.Event) error {
 	s.mux.Lock()
 	s.events = append(s.events, e)
 	s.mux.Unlock()
@@ -46,7 +46,7 @@ func (s *Store) String() string {
 		AggregateType event.AggregateType
 		AggregateId   uuid.UUID
 
-		Event event.EventIface
+		Event event.Event
 	}
 
 	var events []storedEvent
@@ -71,7 +71,7 @@ func (s *Store) String() string {
 
 func New() *Store {
 	return &Store{
-		events: make([]event.EventIface, 0),
-		broker: broker.New[event.EventIface](),
+		events: make([]event.Event, 0),
+		broker: broker.New[event.Event](),
 	}
 }
