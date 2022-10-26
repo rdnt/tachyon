@@ -3,7 +3,6 @@ package redisevent
 import (
 	"encoding/json"
 
-	"github.com/rdnt/tachyon/internal/application/domain/user"
 	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
@@ -15,7 +14,7 @@ type UserCreatedEvent struct {
 
 func UserCreatedEventToJSON(e event.UserCreatedEvent) ([]byte, error) {
 	evt := UserCreatedEvent{
-		UserId: uuid.UUID(e.UserId).String(),
+		UserId: e.UserId.String(),
 		Name:   e.Name,
 	}
 
@@ -35,7 +34,7 @@ func UserCreatedEventFromJSON(b []byte) (event.UserCreatedEvent, error) {
 	}
 
 	return event.UserCreatedEvent{
-		UserId: uuid.UUID(uid),
+		UserId: uid,
 		Name:   evt.Name,
 	}, nil
 }

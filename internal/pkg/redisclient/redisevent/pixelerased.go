@@ -16,8 +16,8 @@ type PixelErasedEvent struct {
 
 func PixelErasedEventToJSON(e event.PixelErasedEvent) ([]byte, error) {
 	evt := PixelErasedEvent{
-		UserId:    uuid.UUID(e.UserId).String(),
-		ProjectId: uuid.UUID(e.ProjectId).String(),
+		UserId:    e.UserId.String(),
+		ProjectId: e.ProjectId.String(),
 		Coords: IntVector2{
 			X: e.Coords.X,
 			Y: e.Coords.Y,
@@ -45,8 +45,8 @@ func PixelErasedEventFromJSON(b []byte) (event.PixelErasedEvent, error) {
 	}
 
 	return event.PixelErasedEvent{
-		UserId:    uuid.UUID(uid),
-		ProjectId: uuid.UUID(pid),
+		UserId:    uid,
+		ProjectId: pid,
 		Coords: project.Vector2{
 			X: evt.Coords.X,
 			Y: evt.Coords.Y,

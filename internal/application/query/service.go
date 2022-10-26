@@ -9,7 +9,7 @@ import (
 )
 
 type EventBus interface {
-	Subscribe() (chan event.Event, error)
+	Subscribe() (chan event.Event, func(), error)
 }
 
 type SessionView interface {

@@ -17,8 +17,8 @@ type PixelDrawnEvent struct {
 
 func PixelDrawnEventToJSON(e event.PixelDrawnEvent) ([]byte, error) {
 	evt := PixelDrawnEvent{
-		UserId:    uuid.UUID(e.UserId).String(),
-		ProjectId: uuid.UUID(e.ProjectId).String(),
+		UserId:    e.UserId.String(),
+		ProjectId: e.ProjectId.String(),
 		Color:     e.Color.String(),
 		Coords: IntVector2{
 			X: e.Coords.X,
@@ -52,8 +52,8 @@ func PixelDrawnEventFromJSON(b []byte) (event.PixelDrawnEvent, error) {
 	}
 
 	return event.PixelDrawnEvent{
-		UserId:    uuid.UUID(uid),
-		ProjectId: uuid.UUID(pid),
+		UserId:    uid,
+		ProjectId: pid,
 		Color:     clr,
 		Coords: project.Vector2{
 			X: evt.Coords.X,

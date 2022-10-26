@@ -14,6 +14,16 @@ type Event struct {
 
 func EventToJSON(e event.Event) ([]byte, error) {
 	switch e := e.(type) {
+	case event.UserCreatedEvent:
+		return UserCreatedEventToJSON(e)
+	case event.ProjectCreatedEvent:
+		return ProjectCreatedEventToJSON(e)
+	case event.SessionCreatedEvent:
+		return SessionCreatedEventToJSON(e)
+	case event.JoinedSessionEvent:
+		return JoinedSessionEventToJSON(e)
+	case event.LeftSessionEvent:
+		return LeftSessionEventToJSON(e)
 	case event.PixelDrawnEvent:
 		return PixelDrawnEventToJSON(e)
 	case event.PixelErasedEvent:
@@ -25,6 +35,16 @@ func EventToJSON(e event.Event) ([]byte, error) {
 
 func EventFromJSON(typ event.Type, b []byte) (event.Event, error) {
 	switch typ {
+	case event.UserCreated:
+		return UserCreatedEventFromJSON(b)
+	case event.ProjectCreated:
+		return ProjectCreatedEventFromJSON(b)
+	case event.SessionCreated:
+		return SessionCreatedEventFromJSON(b)
+	case event.JoinedSession:
+		return JoinedSessionEventFromJSON(b)
+	case event.LeftSession:
+		return LeftSessionEventFromJSON(b)
 	case event.PixelDrawn:
 		return PixelDrawnEventFromJSON(b)
 	case event.PixelErased:
@@ -33,24 +53,3 @@ func EventFromJSON(typ event.Type, b []byte) (event.Event, error) {
 		return nil, errors.New("invalid event type")
 	}
 }
-
-//func redisEventFromJSON(e Event) (event.Event, error) {
-//	if !slices.Contains(event.Types, event.Type(e.Type)) {
-//		return event.Event{}, errors.New("invalid type")
-//	}
-//
-//	if !slices.Contains(event.AggregateTypes, event.AggregateType(e.AggregateType)) {
-//		return event.Event{}, errors.New("invalid type")
-//	}
-//
-//	aggregateId, err := uuid.Parse(e.AggregateId)
-//	if err != nil {
-//		return event.Event{}, err
-//	}
-//
-//	return event.New(
-//		event.Type(e.Type),
-//		event.AggregateType(e.AggregateType),
-//		aggregateId,
-//	), nil
-//}

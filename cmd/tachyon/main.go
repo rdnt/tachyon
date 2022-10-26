@@ -7,24 +7,33 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/go-redis/redis/v9"
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
-	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/internal/application/query"
 	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
 	"github.com/rdnt/tachyon/internal/application/query/view/user_view"
-	"github.com/rdnt/tachyon/internal/event_bus"
-	"github.com/rdnt/tachyon/internal/event_store"
-	"github.com/rdnt/tachyon/pkg/fanout"
+	"github.com/rdnt/tachyon/internal/pkg/redisclient"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 func main() {
-	eventBus := event_bus.New(fanout.New[event.Event]())
+	rdb := redis.NewClient(&redis.Options{
+		Addr: ":6379",
+		DB:   0,
+	})
 
-	eventStore := event_store.New()
+	redisEventBus := redisclient.New(redisclient.Options{
+		Client:    rdb,
+		StreamKey: "events",
+	})
+	eventBus := redisEventBus
+	eventStore := redisEventBus
+	//eventBus := event_bus.New(fanout.New[event.Event]())
+
+	//eventStore := event_store.New()
 	sessionRepo, err := session_repository.New(eventStore)
 	if err != nil {
 		panic(err)
