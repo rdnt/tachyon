@@ -62,12 +62,13 @@ type service struct {
 }
 
 func (s *service) publish(e event.Event) error {
-	err := s.store.Publish(e)
-	if err != nil {
-		return err
-	}
-
-	return s.bus.Publish(e)
+	return s.store.Publish(e)
+	//err := s.store.Publish(e)
+	//if err != nil {
+	//	return err
+	//}
+	//
+	//return s.bus.Publish(e)
 }
 
 func New(eventStore EventStore, messageBus EventBus, sessions SessionRepository, projects ProjectRepository, users UserRepository) Service {

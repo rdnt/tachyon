@@ -9,7 +9,7 @@ import (
 	"github.com/go-redis/redis/v9"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/event"
-	"github.com/rdnt/tachyon/internal/pkg/redisclient"
+	"github.com/rdnt/tachyon/internal/pkg/redis"
 )
 
 func main() {

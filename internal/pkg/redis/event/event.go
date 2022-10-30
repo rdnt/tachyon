@@ -1,4 +1,4 @@
-package redisevent
+package event
 
 import (
 	"errors"

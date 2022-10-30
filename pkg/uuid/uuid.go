@@ -7,6 +7,8 @@ import (
 
 type UUID uuid.UUID
 
+var Nil = UUID(uuid.Nil)
+
 func (id UUID) String() string {
 	return shortuuid.DefaultEncoder.Encode(uuid.UUID(id))
 }

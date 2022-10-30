@@ -1,4 +1,4 @@
-package redisevent
+package event
 
 type IntVector2 struct {
 	X int `json:"x"`

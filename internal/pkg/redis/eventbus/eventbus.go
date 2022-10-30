@@ -1,4 +1,4 @@
-package redisclient
+package eventbus
 
 import (
 	"context"
@@ -8,34 +8,25 @@ import (
 
 	"github.com/go-redis/redis/v9"
 	"github.com/rdnt/tachyon/internal/application/event"
-	"github.com/rdnt/tachyon/internal/pkg/redisclient/redisevent"
+	"github.com/rdnt/tachyon/internal/pkg/interfaces"
+	redisevent "github.com/rdnt/tachyon/internal/pkg/redis/event"
 )
 
-type RedisClient struct {
+var _ interfaces.EventBus[event.Event] = (*RedisEventBus)(nil)
+
+type RedisEventBus struct {
 	client    *redis.Client
 	streamKey string
 }
 
-type Options struct {
-	Client    *redis.Client
-	StreamKey string
-}
-
-func New(opts Options) *RedisClient {
-	return &RedisClient{
-		client:    opts.Client,
-		streamKey: opts.StreamKey,
+func New(client *redis.Client, streamKey string) *RedisEventBus {
+	return &RedisEventBus{
+		client:    client,
+		streamKey: streamKey,
 	}
 }
 
-//type jsonEvent struct {
-//	Type          string           `json:"type"`
-//	AggregateType string           `json:"aggregateType"`
-//	AggregateId   string           `json:"aggregateId"`
-//	Data          interfaces.Event `json:"data"`
-//}
-
-func (r *RedisClient) Publish(e event.Event) error {
+func (r *RedisEventBus) Publish(e event.Event) error {
 	b, err := redisevent.EventToJSON(e)
 	if err != nil {
 		return err
@@ -59,9 +50,7 @@ func (r *RedisClient) Publish(e event.Event) error {
 	return nil
 }
 
-func (r *RedisClient) Subscribe() (chan event.Event, func(), error) {
-	events := make(chan event.Event)
-
+func (r *RedisEventBus) Subscribe(handler func(event2 event.Event)) (func(), error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	done := make(chan bool)
@@ -69,13 +58,13 @@ func (r *RedisClient) Subscribe() (chan event.Event, func(), error) {
 	dispose := func() {
 		cancel()
 		<-done
+		return
 	}
 
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
-				close(events)
 				done <- true
 				return
 			default:
@@ -98,16 +87,16 @@ func (r *RedisClient) Subscribe() (chan event.Event, func(), error) {
 						continue
 					}
 
-					events <- e
+					go handler(e)
 				}
 			}
 		}
 	}()
 
-	return events, dispose, nil
+	return dispose, nil
 }
 
-func (r *RedisClient) Events() ([]event.Event, error) {
+func (r *RedisEventBus) Events() ([]event.Event, error) {
 	msgs, err := r.client.XRange(context.Background(), r.streamKey, "-", "+").Result()
 	if err != nil {
 		return nil, err
@@ -127,7 +116,7 @@ func (r *RedisClient) Events() ([]event.Event, error) {
 	return events, nil
 }
 
-func (r *RedisClient) parseEvent(msg redis.XMessage) (event.Event, error) {
+func (r *RedisEventBus) parseEvent(msg redis.XMessage) (event.Event, error) {
 	val, ok := msg.Values["event"]
 	if !ok {
 		return nil, errors.New("event value does not exist")

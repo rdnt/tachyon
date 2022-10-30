@@ -5,17 +5,15 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/go-redis/redis"
-	"github.com/google/uuid"
+	"github.com/go-redis/redis/v9"
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/application/query"
-	projectview "github.com/rdnt/tachyon/internal/application/query/project_repository"
-	"github.com/rdnt/tachyon/internal/event_store"
-	"github.com/rdnt/tachyon/internal/redis_event_bus"
-	"github.com/rdnt/tachyon/pkg/redis_fanout_exchange"
+	"github.com/rdnt/tachyon/internal/pkg/redis/eventbus"
+	"github.com/rdnt/tachyon/internal/pkg/redis/eventstore"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 func main() {
@@ -23,12 +21,10 @@ func main() {
 		Addr: ":6379",
 		DB:   0,
 	})
-	fanout := redis_fanout_exchange.New(rdb)
-	eventBus := redis_event_bus.New(fanout)
 
-	//eventBus := event_bus.New(fanout.New[event.event]())
-
-	eventStore := event_store.New()
+	const redisStreamKey = "events"
+	eventStore := eventstore.New(rdb, redisStreamKey)
+	eventBus := eventbus.New(rdb, redisStreamKey)
 
 	sessionRepo, err := session_repository.New(eventStore)
 
@@ -44,11 +40,11 @@ func main() {
 		userRepo,
 	)
 
-	sessionView, err := session_repository.New(eventStore)
+	sessionView, err := session_repository.New(eventBus)
 
-	userView, err := user_repository.New(eventStore)
+	userView, err := user_repository.New(eventBus)
 
-	projectView, err := projectview.New(eventBus)
+	projectView, err := project_repository.New(eventBus)
 	if err != nil {
 		panic(err)
 	}
@@ -60,10 +56,10 @@ func main() {
 		projectView,
 	)
 
-	uid := uuid.UUID(uuid.Nil)
+	uid := uuid.Nil
 	err = commands.CreateUser(uid, "user-1")
 
-	pid := uuid.UUID(uuid.Nil)
+	pid := uuid.Nil
 	err = commands.CreateProject(pid, "project-1", uid)
 
 	m := &model{

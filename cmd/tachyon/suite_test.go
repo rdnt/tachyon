@@ -8,16 +8,13 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
-	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/internal/application/query"
-	"github.com/rdnt/tachyon/internal/event_bus"
 	"github.com/rdnt/tachyon/internal/event_store"
-	"github.com/rdnt/tachyon/pkg/fanout"
 	"gotest.tools/assert"
 )
 
 type suite struct {
-	bus         *event_bus.Bus
+	bus         *event_store.Store
 	store       *event_store.Store
 	sessionRepo *session_repository.Repo
 	userRepo    *user_repository.Repo
@@ -30,9 +27,10 @@ type suite struct {
 }
 
 func newSuite(t *testing.T) *suite {
-	eventBus := event_bus.New(fanout.New[event.Event]())
+	//eventBus := event_bus.New(fanout.New[event.Event]())
 
 	eventStore := event_store.New()
+	eventBus := eventStore
 
 	sessionRepo, err := session_repository.New(eventStore)
 	assert.NilError(t, err)
@@ -51,13 +49,13 @@ func newSuite(t *testing.T) *suite {
 		userRepo,
 	)
 
-	sessionView, err := session_repository.New(eventStore)
+	sessionView, err := session_repository.New(eventBus)
 	assert.NilError(t, err)
 
-	userView, err := user_repository.New(eventStore)
+	userView, err := user_repository.New(eventBus)
 	assert.NilError(t, err)
 
-	projectView, err := project_repository.New(eventStore)
+	projectView, err := project_repository.New(eventBus)
 	assert.NilError(t, err)
 	//sessionView := session_view.New()
 	//userView := user_view.New()

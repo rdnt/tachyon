@@ -10,6 +10,7 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command"
 	"github.com/rdnt/tachyon/internal/application/domain/project"
 	"github.com/rdnt/tachyon/internal/application/query"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 type model struct {
@@ -77,7 +78,7 @@ func (m model) View() string {
 	}
 
 	for _, p := range proj.Pixels {
-		if p.Coords.Y >= m.height || p.Coords.X >= m.width {
+		if p.Coords.Y >= m.height || p.Coords.X >= m.width || p.Coords.Y < 0 || p.Coords.X < 0 {
 			continue
 		}
 

@@ -13,9 +13,8 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/application/query"
-	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
-	"github.com/rdnt/tachyon/internal/application/query/view/user_view"
-	"github.com/rdnt/tachyon/internal/pkg/redisclient"
+	"github.com/rdnt/tachyon/internal/pkg/redis/eventbus"
+	"github.com/rdnt/tachyon/internal/pkg/redis/eventstore"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
@@ -25,12 +24,9 @@ func main() {
 		DB:   0,
 	})
 
-	redisEventBus := redisclient.New(redisclient.Options{
-		Client:    rdb,
-		StreamKey: "events",
-	})
-	eventBus := redisEventBus
-	eventStore := redisEventBus
+	const redisStreamKey = "events"
+	eventStore := eventstore.New(rdb, redisStreamKey)
+	eventBus := eventbus.New(rdb, redisStreamKey)
 	//eventBus := event_bus.New(fanout.New[event.Event]())
 
 	//eventStore := event_store.New()
@@ -55,8 +51,15 @@ func main() {
 		userRepo,
 	)
 
-	sessionView := session_view.New()
-	userView := user_view.New()
+	sessionView, err := session_repository.New(eventStore)
+	if err != nil {
+		panic(err)
+	}
+
+	userView, err := user_repository.New(eventStore)
+	if err != nil {
+		panic(err)
+	}
 
 	projectView, err := project_repository.New(eventStore)
 	if err != nil {
@@ -93,9 +96,11 @@ func main() {
 			case "repo":
 				fmt.Println("sessions:", sessionRepo)
 				fmt.Println("users:", userRepo)
+				fmt.Println("projects:", projectRepo)
 			case "view":
 				fmt.Println("sessions:", sessionView)
 				fmt.Println("users:", userView)
+				fmt.Println("projects:", projectView)
 			case "create user":
 				uid := uuid.New()
 				err := commandSvc.CreateUser(uid, "user-1")

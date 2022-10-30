@@ -8,7 +8,7 @@ import (
 
 type FanOutExchange[E any] interface {
 	Publish(event E) error
-	Subscribe() (chan E, error)
+	Subscribe() (chan E, func(), error)
 }
 
 type Bus struct {
@@ -19,7 +19,7 @@ func (b *Bus) Publish(event event.Event) error {
 	return b.exchange.Publish(event)
 }
 
-func (b *Bus) Subscribe() (chan event.Event, error) {
+func (b *Bus) Subscribe() (chan event.Event, func(), error) {
 	return b.exchange.Subscribe()
 }
 

@@ -13,7 +13,7 @@ import (
 
 type EventStore interface {
 	Events() ([]event.Event, error)
-	Subscribe(h func(e event.Event)) (dispose func(), err error)
+	Subscribe(handler func(e event.Event)) (dispose func(), err error)
 }
 
 type Repo struct {

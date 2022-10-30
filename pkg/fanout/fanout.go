@@ -7,37 +7,46 @@ import (
 
 type Exchange[E any] interface {
 	Publish(event E) error
-	Subscribe() (chan E, error)
+	Subscribe() (chan E, func(), error)
 }
 
 type FanOut[E any] struct {
-	lock          sync.Mutex
-	subscriptions []chan E
+	mux           sync.Mutex
+	idx           int
+	subscriptions map[int]chan E
 }
 
 func New[E any]() Exchange[E] {
-	return &FanOut[E]{subscriptions: []chan E{}}
+	return &FanOut[E]{subscriptions: map[int]chan E{}}
 }
 
-func (f *FanOut[E]) Subscribe() (chan E, error) {
-	f.lock.Lock()
-	defer f.lock.Unlock()
+func (f *FanOut[E]) Subscribe() (chan E, func(), error) {
+	f.mux.Lock()
+	defer f.mux.Unlock()
 
 	if f.subscriptions == nil {
-		f.subscriptions = []chan E{}
+		f.subscriptions = map[int]chan E{}
 	}
 
 	sub := make(chan E)
 
-	f.subscriptions = append(f.subscriptions, sub)
+	idx := f.idx
+	f.subscriptions[f.idx] = sub
+	f.idx++
 
-	return sub, nil
+	dispose := func() {
+		f.mux.Lock()
+		delete(f.subscriptions, idx)
+		f.mux.Unlock()
+	}
+
+	return sub, dispose, nil
 }
 
 func (f *FanOut[E]) Publish(event E) error {
-	f.lock.Lock()
+	f.mux.Lock()
 	subs := f.subscriptions
-	f.lock.Unlock()
+	f.mux.Unlock()
 
 	for _, conn := range subs {
 		conn <- event

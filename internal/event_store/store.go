@@ -15,8 +15,10 @@ type Store struct {
 	broker *broker.Broker[event.Event]
 }
 
-func (s *Store) Subscribe(h func(e event.Event)) (dispose func(), err error) {
-	return s.broker.Subscribe(h), nil
+func (s *Store) Subscribe(handler func(e event.Event)) (dispose func(), err error) {
+	return s.broker.Subscribe(func(e event.Event) {
+		handler(e)
+	}), nil
 }
 
 func (s *Store) Events() ([]event.Event, error) {
@@ -29,9 +31,9 @@ func (s *Store) Events() ([]event.Event, error) {
 func (s *Store) Publish(e event.Event) error {
 	s.mux.Lock()
 	s.events = append(s.events, e)
-	s.mux.Unlock()
-
 	s.broker.Publish(e)
+
+	s.mux.Unlock()
 
 	return nil
 }
