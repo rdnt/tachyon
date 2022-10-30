@@ -14,6 +14,7 @@ type Config struct {
 type Redis struct {
 	Host      string `json:"host"`
 	Port      int    `json:"port"`
+	Password  string `json:"password"`
 	Database  int    `json:"database"`
 	StreamKey string `json:"streamKey"`
 }
@@ -57,6 +58,7 @@ func createDefault() (Config, error) {
 		Redis: Redis{
 			Host:      "0.0.0.0",
 			Port:      6379,
+			Password:  "",
 			Database:  0,
 			StreamKey: "events",
 		},

@@ -24,8 +24,9 @@ func main() {
 	}
 
 	rdb := redis.NewClient(&redis.Options{
-		Addr: fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
-		DB:   cfg.Redis.Database,
+		Addr:     fmt.Sprintf("%s:%d", cfg.Redis.Host, cfg.Redis.Port),
+		Password: cfg.Redis.Password,
+		DB:       cfg.Redis.Database,
 	})
 
 	redisClient := client.New(rdb, cfg.Redis.StreamKey)
