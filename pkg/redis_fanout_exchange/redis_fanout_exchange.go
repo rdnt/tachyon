@@ -26,11 +26,6 @@ func (e *Exchange) Publish(event []byte) error {
 }
 
 func (e *Exchange) Subscribe() (chan []byte, error) {
-	//err := e.client.XGroupCreate("events", "query", "$").Err()
-	//if err != nil && err.Error() != errBusyGroup {
-	//	return nil, err
-	//}
-
 	events := make(chan []byte)
 
 	go func() {

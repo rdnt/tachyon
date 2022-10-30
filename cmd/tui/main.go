@@ -11,6 +11,7 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/application/query"
+	"github.com/rdnt/tachyon/internal/pkg/redis/client"
 	"github.com/rdnt/tachyon/internal/pkg/redis/eventbus"
 	"github.com/rdnt/tachyon/internal/pkg/redis/eventstore"
 	"github.com/rdnt/tachyon/pkg/uuid"
@@ -23,8 +24,9 @@ func main() {
 	})
 
 	const redisStreamKey = "events"
-	eventStore := eventstore.New(rdb, redisStreamKey)
-	eventBus := eventbus.New(rdb, redisStreamKey)
+	redisClient := client.New(rdb, redisStreamKey)
+	eventStore := eventstore.New(redisClient)
+	eventBus := eventbus.New(redisClient)
 
 	sessionRepo, err := session_repository.New(eventStore)
 

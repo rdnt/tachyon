@@ -4,15 +4,11 @@ import (
 	"fmt"
 
 	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/pkg/fanout"
 )
 
-type FanOutExchange[E any] interface {
-	Publish(event E) error
-	Subscribe() (chan E, func(), error)
-}
-
 type Bus struct {
-	exchange FanOutExchange[event.Event]
+	exchange fanout.Exchange[event.Event]
 }
 
 func (b *Bus) Publish(event event.Event) error {
@@ -27,8 +23,8 @@ func (b *Bus) String() string {
 	return fmt.Sprint(b.exchange)
 }
 
-func New(exchange FanOutExchange[event.Event]) *Bus {
+func New() *Bus {
 	return &Bus{
-		exchange: exchange,
+		exchange: fanout.New[event.Event](),
 	}
 }

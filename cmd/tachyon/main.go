@@ -13,6 +13,7 @@ import (
 	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/application/query"
+	"github.com/rdnt/tachyon/internal/pkg/redis/client"
 	"github.com/rdnt/tachyon/internal/pkg/redis/eventbus"
 	"github.com/rdnt/tachyon/internal/pkg/redis/eventstore"
 	"github.com/rdnt/tachyon/pkg/uuid"
@@ -25,8 +26,9 @@ func main() {
 	})
 
 	const redisStreamKey = "events"
-	eventStore := eventstore.New(rdb, redisStreamKey)
-	eventBus := eventbus.New(rdb, redisStreamKey)
+	redisClient := client.New(rdb, redisStreamKey)
+	eventStore := eventstore.New(redisClient)
+	eventBus := eventbus.New(redisClient)
 	//eventBus := event_bus.New(fanout.New[event.Event]())
 
 	//eventStore := event_store.New()
@@ -51,17 +53,17 @@ func main() {
 		userRepo,
 	)
 
-	sessionView, err := session_repository.New(eventStore)
+	sessionView, err := session_repository.New(eventBus)
 	if err != nil {
 		panic(err)
 	}
 
-	userView, err := user_repository.New(eventStore)
+	userView, err := user_repository.New(eventBus)
 	if err != nil {
 		panic(err)
 	}
 
-	projectView, err := project_repository.New(eventStore)
+	projectView, err := project_repository.New(eventBus)
 	if err != nil {
 		panic(err)
 	}
