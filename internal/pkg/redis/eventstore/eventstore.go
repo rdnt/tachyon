@@ -32,7 +32,7 @@ func (store *EventStore) Publish(e event.Event) error {
 }
 
 func (store *EventStore) Subscribe(h func(e event.Event)) (func(), error) {
-	// Do not use the redis client but subscribe directly to the broker
+	// Do not use the redis tcplinepoc but subscribe directly to the broker
 	return store.broker.Subscribe(h), nil
 }
 
