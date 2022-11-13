@@ -9,9 +9,9 @@ import (
 	"sync"
 
 	"github.com/gorilla/websocket"
-	wsevent "github.com/rdnt/tachyon/cmd/server/websocket/event"
-	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/query"
+	"github.com/rdnt/tachyon/internal/server/application/command"
+	"github.com/rdnt/tachyon/internal/server/application/query"
+	wsevent "github.com/rdnt/tachyon/internal/server/websocket/event"
 )
 
 type Server struct {
@@ -97,7 +97,7 @@ func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		e, err := wsevent.FromJSON(evt.Event, b)
+		e, err := wsevent.FromJSON(wsevent.Type(evt.Event), b)
 		if err != nil {
 			fmt.Println(err)
 			continue

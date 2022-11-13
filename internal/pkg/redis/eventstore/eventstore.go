@@ -1,7 +1,7 @@
 package eventstore
 
 import (
-	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/server/application/event"
 	"github.com/rdnt/tachyon/internal/pkg/redis/client"
 	"github.com/rdnt/tachyon/pkg/broker"
 )

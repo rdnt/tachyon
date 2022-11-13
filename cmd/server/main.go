@@ -9,15 +9,16 @@ import (
 	"syscall"
 
 	"github.com/go-redis/redis/v9"
-	"github.com/rdnt/tachyon/cmd/server/websocket"
-	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
-	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
-	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
-	"github.com/rdnt/tachyon/internal/application/query"
+	"github.com/rdnt/tachyon/internal/server/application/command"
+	"github.com/rdnt/tachyon/internal/server/application/command/repository/project_repository"
+	"github.com/rdnt/tachyon/internal/server/application/command/repository/session_repository"
+	"github.com/rdnt/tachyon/internal/server/application/command/repository/user_repository"
+	"github.com/rdnt/tachyon/internal/server/application/query"
 	"github.com/rdnt/tachyon/internal/pkg/redis/client"
 	"github.com/rdnt/tachyon/internal/pkg/redis/eventbus"
 	"github.com/rdnt/tachyon/internal/pkg/redis/eventstore"
+	"github.com/rdnt/tachyon/internal/server/websocket"
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 func main() {
@@ -80,6 +81,27 @@ func main() {
 		userView,
 		projectView,
 	)
+
+	uid := uuid.Nil
+	err = commands.CreateUser(uid, "user-1")
+	fmt.Println(err)
+
+	pid := uuid.Nil
+	err = commands.CreateProject(pid, "project-1", uid)
+	fmt.Println(err)
+
+	//m := &model{
+	//	commands:  commands,
+	//	queries:   queries,
+	//	projectId: pid,
+	//}
+	//
+	//p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseAllMotion())
+	//
+	//err = p.Start()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	s := websocket.New(commands, queries)
 

@@ -3,7 +3,7 @@ package command
 import (
 	"errors"
 
-	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/server/application/event"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/rdnt/tachyon/internal/application/domain/session"
+	"github.com/rdnt/tachyon/internal/server/application/domain/session"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 

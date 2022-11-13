@@ -7,9 +7,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	gookitcolor "github.com/gookit/color"
-	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/query"
+	"github.com/rdnt/tachyon/internal/server/application/command"
+	"github.com/rdnt/tachyon/internal/server/application/domain/project"
+	"github.com/rdnt/tachyon/internal/server/application/query"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 

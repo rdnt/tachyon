@@ -1,22 +1,23 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v9"
-	"github.com/rdnt/tachyon/cmd/server/websocket"
-	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/command/repository/project_repository"
-	"github.com/rdnt/tachyon/internal/application/command/repository/session_repository"
-	"github.com/rdnt/tachyon/internal/application/command/repository/user_repository"
-	"github.com/rdnt/tachyon/internal/application/query"
 	"github.com/rdnt/tachyon/internal/client/application"
 	"github.com/rdnt/tachyon/internal/client/remote"
 	redisclient "github.com/rdnt/tachyon/internal/pkg/redis/client"
 	"github.com/rdnt/tachyon/internal/pkg/redis/eventbus"
 	"github.com/rdnt/tachyon/internal/pkg/redis/eventstore"
+	"github.com/rdnt/tachyon/internal/server/application/command"
+	"github.com/rdnt/tachyon/internal/server/application/command/repository/project_repository"
+	"github.com/rdnt/tachyon/internal/server/application/command/repository/session_repository"
+	"github.com/rdnt/tachyon/internal/server/application/command/repository/user_repository"
+	"github.com/rdnt/tachyon/internal/server/application/query"
+	"github.com/rdnt/tachyon/internal/server/websocket"
 	"gotest.tools/assert"
 )
 
@@ -26,10 +27,16 @@ type server struct {
 func newServer(t *testing.T) *server {
 	minirdb := miniredis.RunT(t)
 
+	_, err := minirdb.XAdd("events", "1", []string{})
+	assert.NilError(t, err)
+
 	rdb := redis.NewClient(&redis.Options{
 		Addr: minirdb.Addr(),
 		DB:   0,
 	})
+
+	err = rdb.XDel(context.Background(), "events", "1-0").Err()
+	assert.NilError(t, err)
 
 	redisClient := redisclient.New(rdb, "events")
 	eventStore := eventstore.New(redisClient)
@@ -84,7 +91,7 @@ type client struct {
 }
 
 func newClient(t *testing.T) *client {
-	r, err := remote.New(":80/ws")
+	r, err := remote.New("ws://:80/ws")
 	if err != nil {
 		panic(err)
 	}

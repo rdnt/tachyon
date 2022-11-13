@@ -3,8 +3,8 @@ package main_test
 import (
 	"testing"
 
-	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/domain/project/path"
+	"github.com/rdnt/tachyon/internal/server/application/command"
+	"github.com/rdnt/tachyon/internal/server/application/domain/project/path"
 	"github.com/rdnt/tachyon/pkg/uuid"
 	"gotest.tools/assert"
 )

@@ -1,7 +1,7 @@
 package event
 
 import (
-	"github.com/rdnt/tachyon/internal/application/domain/project"
+	"github.com/rdnt/tachyon/internal/client/application/domain/project"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 

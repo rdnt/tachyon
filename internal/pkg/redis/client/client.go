@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v9"
-	"github.com/rdnt/tachyon/internal/application/event"
 	"github.com/rdnt/tachyon/internal/pkg/redis/client/redisevent"
+	"github.com/rdnt/tachyon/internal/server/application/event"
 )
 
 type Client struct {
@@ -114,6 +114,7 @@ func (r *Client) Events() ([]event.Event, error) {
 }
 
 func (r *Client) parseEvent(msg redis.XMessage) (event.Event, error) {
+	fmt.Println(msg)
 	val, ok := msg.Values["event"]
 	if !ok {
 		return nil, errors.New("event value does not exist")
@@ -126,7 +127,7 @@ func (r *Client) parseEvent(msg redis.XMessage) (event.Event, error) {
 
 	v2, ok := msg.Values["type"]
 	if !ok {
-		return nil, errors.New("event value does not exist")
+		return nil, errors.New("type value does not exist")
 	}
 
 	s2, ok := v2.(string)

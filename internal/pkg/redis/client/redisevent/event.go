@@ -2,8 +2,9 @@ package redisevent
 
 import (
 	"errors"
+	"fmt"
 
-	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/server/application/event"
 )
 
 type Event struct {
@@ -29,7 +30,7 @@ func EventToJSON(e event.Event) ([]byte, error) {
 	case event.PixelErasedEvent:
 		return PixelErasedEventToJSON(e)
 	default:
-		return nil, errors.New("no event marshaler")
+		return nil, errors.New(fmt.Sprint("no event marshaler2", e))
 	}
 }
 

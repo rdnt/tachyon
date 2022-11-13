@@ -5,7 +5,21 @@ import (
 	"image/color"
 	"strconv"
 	"strings"
+
+	"github.com/rdnt/tachyon/pkg/uuid"
 )
+
+type Project struct {
+	Id      uuid.UUID
+	Name    string
+	OwnerId uuid.UUID
+	Pixels  []Pixel
+}
+
+type Pixel struct {
+	Color  Color
+	Coords Vector2
+}
 
 type Color color.RGBA
 
@@ -30,4 +44,12 @@ func ColorFromString(s string) (c Color, err error) {
 type Vector2 struct {
 	X int
 	Y int
+}
+
+func New(id uuid.UUID, ownerId uuid.UUID, name string) Project {
+	return Project{
+		Id:      id,
+		Name:    name,
+		OwnerId: ownerId,
+	}
 }

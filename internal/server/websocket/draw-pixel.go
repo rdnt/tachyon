@@ -1,9 +1,9 @@
 package websocket
 
 import (
-	wsevent "github.com/rdnt/tachyon/cmd/server/websocket/event"
-	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/domain/project"
+	"github.com/rdnt/tachyon/internal/server/application/command"
+	"github.com/rdnt/tachyon/internal/server/application/domain/project"
+	wsevent "github.com/rdnt/tachyon/internal/server/websocket/event"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 

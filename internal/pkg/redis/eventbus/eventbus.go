@@ -1,7 +1,7 @@
 package eventbus
 
 import (
-	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/server/application/event"
 	"github.com/rdnt/tachyon/internal/pkg/redis/client"
 )
 

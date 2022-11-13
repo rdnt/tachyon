@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rdnt/tachyon/internal/application/command"
-	"github.com/rdnt/tachyon/internal/application/command/aggregate"
-	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/server/application/command"
+	"github.com/rdnt/tachyon/internal/server/application/command/aggregate"
+	"github.com/rdnt/tachyon/internal/server/application/domain/session"
+	"github.com/rdnt/tachyon/internal/server/application/event"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 

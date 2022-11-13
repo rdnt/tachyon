@@ -3,6 +3,7 @@ package websocketevent
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 
 	"github.com/rdnt/tachyon/internal/client/application/event"
 )
@@ -32,6 +33,12 @@ func FromJSON(b []byte) (event.Event, error) {
 
 func ToJSON(e event.Event) ([]byte, error) {
 	switch e := e.(type) {
+	case event.CreateUserEvent:
+		return CreateUserEventToJSON(e)
+	case event.CreateProjectEvent:
+		return CreateProjectEventToJSON(e)
+	case event.DrawPixelEvent:
+		return DrawPixelEventToJSON(e)
 	case event.UserCreatedEvent:
 		return UserCreatedEventToJSON(e)
 	case event.ProjectCreatedEvent:
@@ -39,6 +46,6 @@ func ToJSON(e event.Event) ([]byte, error) {
 	case event.PixelDrawnEvent:
 		return PixelDrawnEventToJSON(e)
 	default:
-		return nil, errors.New("no event marshaler")
+		return nil, errors.New(fmt.Sprint("no event marshaler", e))
 	}
 }

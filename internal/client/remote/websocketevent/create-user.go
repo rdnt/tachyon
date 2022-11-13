@@ -7,7 +7,8 @@ import (
 )
 
 type CreateUserEvent struct {
-	Name string `json:"name"`
+	Event string `json:"event"`
+	Name  string `json:"name"`
 }
 
 func CreateUserEventFromJSON(b []byte) (event.CreateUserEvent, error) {
@@ -20,4 +21,13 @@ func CreateUserEventFromJSON(b []byte) (event.CreateUserEvent, error) {
 	return event.CreateUserEvent{
 		Name: e.Name,
 	}, nil
+}
+
+func CreateUserEventToJSON(e event.CreateUserEvent) ([]byte, error) {
+	e2 := CreateUserEvent{
+		Event: e.Type().String(),
+		Name:  e.Name,
+	}
+
+	return json.Marshal(e2)
 }

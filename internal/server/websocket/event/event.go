@@ -10,7 +10,7 @@ type Event struct {
 	Event string `json:"event"`
 }
 
-func FromJSON(typ string, b []byte) (any, error) {
+func FromJSON(typ Type, b []byte) (any, error) {
 	switch typ {
 	case CreateUser:
 		return CreateUserEventFromJSON(b)

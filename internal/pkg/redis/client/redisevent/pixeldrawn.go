@@ -3,8 +3,8 @@ package redisevent
 import (
 	"encoding/json"
 
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/server/application/domain/project"
+	"github.com/rdnt/tachyon/internal/server/application/event"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 

@@ -1,10 +1,10 @@
 package query
 
 import (
-	"github.com/rdnt/tachyon/internal/application/domain/project"
-	"github.com/rdnt/tachyon/internal/application/domain/session"
-	"github.com/rdnt/tachyon/internal/application/domain/user"
-	"github.com/rdnt/tachyon/internal/application/event"
+	"github.com/rdnt/tachyon/internal/server/application/domain/project"
+	"github.com/rdnt/tachyon/internal/server/application/domain/session"
+	"github.com/rdnt/tachyon/internal/server/application/domain/user"
+	"github.com/rdnt/tachyon/internal/server/application/event"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 

@@ -39,6 +39,6 @@ func (app *Application) DrawPixel(
 	})
 }
 
-func (app *Application) Project(projectId uuid.UUID) error {
+func (app *Application) Project(projectId uuid.UUID) (project.Project, error) {
 	return app.remote.Project(projectId)
 }

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/rdnt/tachyon/internal/application/query/view/session_view"
+	"github.com/rdnt/tachyon/internal/server/application/query/view/session_view"
 	"github.com/rdnt/tachyon/pkg/uuid"
 	"gotest.tools/assert"
 )
