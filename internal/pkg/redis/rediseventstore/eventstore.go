@@ -1,17 +1,17 @@
-package eventstore
+package rediseventstore
 
 import (
+	"github.com/rdnt/tachyon/internal/pkg/redis/redisclient"
 	"github.com/rdnt/tachyon/internal/server/application/event"
-	"github.com/rdnt/tachyon/internal/pkg/redis/client"
 	"github.com/rdnt/tachyon/pkg/broker"
 )
 
 type EventStore struct {
-	client *client.Client
+	client *redisclient.Client
 	broker *broker.Broker[event.Event]
 }
 
-func New(client *client.Client) *EventStore {
+func New(client *redisclient.Client) *EventStore {
 	return &EventStore{
 		client: client,
 		broker: broker.New[event.Event](),

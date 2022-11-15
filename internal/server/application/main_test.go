@@ -1,4 +1,4 @@
-package main_test
+package application_test
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	"gotest.tools/assert"
 )
 
-func TestTachyon(t *testing.T) {
+func TestServer(t *testing.T) {
 	s := newSuite(t)
 
 	uid := uuid.New()

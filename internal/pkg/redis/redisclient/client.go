@@ -1,4 +1,4 @@
-package client
+package redisclient
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v9"
-	"github.com/rdnt/tachyon/internal/pkg/redis/client/redisevent"
+	"github.com/rdnt/tachyon/internal/pkg/redis/redisclient/redisevent"
 	"github.com/rdnt/tachyon/internal/server/application/event"
 )
 

@@ -9,14 +9,12 @@ import (
 	"syscall"
 
 	"github.com/go-redis/redis/v9"
+	"github.com/rdnt/tachyon/internal/pkg/redis/redisclient"
 	"github.com/rdnt/tachyon/internal/server/application/command"
 	"github.com/rdnt/tachyon/internal/server/application/command/repository/project_repository"
 	"github.com/rdnt/tachyon/internal/server/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/server/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/server/application/query"
-	"github.com/rdnt/tachyon/internal/pkg/redis/client"
-	"github.com/rdnt/tachyon/internal/pkg/redis/eventbus"
-	"github.com/rdnt/tachyon/internal/pkg/redis/eventstore"
 	"github.com/rdnt/tachyon/internal/server/websocket"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
@@ -33,7 +31,7 @@ func main() {
 		DB:       cfg.Redis.Database,
 	})
 
-	redisClient := client.New(rdb, cfg.Redis.StreamKey)
+	redisClient := redisclient.New(rdb, cfg.Redis.StreamKey)
 	eventStore := eventstore.New(redisClient)
 	eventBus := eventbus.New(redisClient)
 

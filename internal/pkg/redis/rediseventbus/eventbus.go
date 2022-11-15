@@ -1,15 +1,15 @@
-package eventbus
+package rediseventbus
 
 import (
+	"github.com/rdnt/tachyon/internal/pkg/redis/redisclient"
 	"github.com/rdnt/tachyon/internal/server/application/event"
-	"github.com/rdnt/tachyon/internal/pkg/redis/client"
 )
 
 type EventBus struct {
-	client *client.Client
+	client *redisclient.Client
 }
 
-func New(client *client.Client) *EventBus {
+func New(client *redisclient.Client) *EventBus {
 	return &EventBus{client: client}
 }
 

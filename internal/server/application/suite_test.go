@@ -1,15 +1,15 @@
-package main_test
+package application_test
 
 import (
 	"testing"
 	"time"
 
+	"github.com/rdnt/tachyon/internal/event_store"
 	"github.com/rdnt/tachyon/internal/server/application/command"
 	"github.com/rdnt/tachyon/internal/server/application/command/repository/project_repository"
 	"github.com/rdnt/tachyon/internal/server/application/command/repository/session_repository"
 	"github.com/rdnt/tachyon/internal/server/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/server/application/query"
-	"github.com/rdnt/tachyon/internal/event_store"
 	"gotest.tools/assert"
 )
 
