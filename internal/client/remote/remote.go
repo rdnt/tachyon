@@ -6,22 +6,20 @@ import (
 	"log"
 
 	"github.com/gorilla/websocket"
-	"github.com/rdnt/tachyon/internal/client/application/domain/project"
 	"github.com/rdnt/tachyon/internal/client/application/event"
 	"github.com/rdnt/tachyon/internal/client/remote/websocketevent"
-	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 type Remote struct {
-	address  string
-	conn     *websocket.Conn
-	messages chan event.Event
+	address string
+	conn    *websocket.Conn
+	events  chan event.Event
 }
 
 func New(address string) (*Remote, error) {
 	r := &Remote{
-		address:  address,
-		messages: make(chan event.Event),
+		address: address,
+		events:  make(chan event.Event),
 	}
 
 	conn, _, err := websocket.DefaultDialer.Dial(address, nil)
@@ -76,26 +74,9 @@ func (r *Remote) Publish(e event.Event) error {
 }
 
 func (r *Remote) handleEvent(e event.Event) {
-	switch e.Type() {
-	case event.UserCreated:
-		fmt.Println("USER CREATED", e)
-	}
-
-	fmt.Println("received event", e)
+	r.events <- e
 }
 
-func (r *Remote) Project(id uuid.UUID) (project.Project, error) {
-	return project.Project{
-		Id:      id,
-		Name:    "implement-me",
-		OwnerId: uuid.Nil,
-		Pixels: []project.Pixel{
-			{
-				Color: project.Color{R: 0xff, A: 0xff},
-				Coords: project.Vector2{
-					X: 1, Y: 1,
-				},
-			},
-		},
-	}, nil
+func (r *Remote) Events() chan event.Event {
+	return r.events
 }

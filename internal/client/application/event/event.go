@@ -3,26 +3,27 @@ package event
 import (
 	"errors"
 
+	"github.com/rdnt/tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 )
 
 type Event interface {
 	Type() Type
-	//AggregateType() AggregateType
-	//AggregateId() uuid.UUID
+	AggregateType() AggregateType
+	AggregateId() uuid.UUID
 }
 
-//type AggregateType string
-//
-//func (t AggregateType) String() string {
-//	return string(t)
-//}
-//
-//const (
-//	User    AggregateType = "user"
-//	Project AggregateType = "project"
-//	Session AggregateType = "session"
-//)
+type AggregateType string
+
+func (t AggregateType) String() string {
+	return string(t)
+}
+
+const (
+	User    AggregateType = "user"
+	Project AggregateType = "project"
+	Session AggregateType = "session"
+)
 
 type Type string
 

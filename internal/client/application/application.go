@@ -8,13 +8,27 @@ import (
 )
 
 type Application struct {
-	remote *remote.Remote
+	remote  *remote.Remote
+	project *project.Project
 }
 
 func New(remote *remote.Remote) (*Application, error) {
-	return &Application{
+	a := &Application{
 		remote: remote,
-	}, nil
+	}
+
+	go func() {
+		for e := range remote.Events() {
+			switch e.Type() {
+			case event.ProjectCreated:
+				if a.project == nil {
+
+				}
+			}
+		}
+	}()
+
+	return a, nil
 }
 
 func (app *Application) CreateUser(name string) error {
@@ -24,6 +38,12 @@ func (app *Application) CreateUser(name string) error {
 }
 
 func (app *Application) CreateProject(name string) error {
+	return app.remote.Publish(event.CreateProjectEvent{
+		Name: name,
+	})
+}
+
+func (app *Application) CreateSession(projectId uuid.UUID, name string) error {
 	return app.remote.Publish(event.CreateProjectEvent{
 		Name: name,
 	})
