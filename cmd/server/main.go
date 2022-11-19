@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/go-redis/redis/v9"
+
 	"tachyon/internal/pkg/redis/redisclient"
 	"tachyon/internal/pkg/redis/rediseventbus"
 	"tachyon/internal/pkg/redis/rediseventstore"
