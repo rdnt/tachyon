@@ -3,14 +3,11 @@ package event
 import (
 	"errors"
 
-	"github.com/rdnt/tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 )
 
 type Event interface {
 	Type() Type
-	AggregateType() AggregateType
-	AggregateId() uuid.UUID
 }
 
 type AggregateType string
@@ -39,12 +36,7 @@ func TypeFromString(s string) (Type, error) {
 	return Type(s), nil
 }
 
-var Types = []Type{
-	UserCreated,
-	ProjectCreated,
-	SessionCreated,
-	JoinedSession,
-	LeftSession,
-	PixelDrawn,
-	PixelErased,
-}
+const (
+	UpdatePixel  Type = "update-pixel"
+	PixelUpdated Type = "pixel-updated"
+)

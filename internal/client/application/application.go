@@ -1,10 +1,10 @@
 package application
 
 import (
+	"fmt"
 	"github.com/rdnt/tachyon/internal/client/application/domain/project"
-	"github.com/rdnt/tachyon/internal/client/application/event"
 	"github.com/rdnt/tachyon/internal/client/remote"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"github.com/rdnt/tachyon/internal/pkg/event"
 )
 
 type Application struct {
@@ -19,11 +19,9 @@ func New(remote *remote.Remote) (*Application, error) {
 
 	go func() {
 		for e := range remote.Events() {
-			switch e.Type() {
-			case event.ProjectCreated:
-				if a.project == nil {
-
-				}
+			switch e := e.(type) {
+			case event.ConnectedEvent:
+				fmt.Println(e)
 			}
 		}
 	}()
@@ -31,34 +29,22 @@ func New(remote *remote.Remote) (*Application, error) {
 	return a, nil
 }
 
-func (app *Application) CreateUser(name string) error {
-	return app.remote.Publish(event.CreateUserEvent{
+func (app *Application) CreateSession(name string) error {
+	return app.remote.Publish(event.CreateSessionEvent{
 		Name: name,
 	})
 }
 
-func (app *Application) CreateProject(name string) error {
-	return app.remote.Publish(event.CreateProjectEvent{
-		Name: name,
-	})
-}
-
-func (app *Application) CreateSession(projectId uuid.UUID, name string) error {
-	return app.remote.Publish(event.CreateProjectEvent{
-		Name: name,
-	})
-}
-
-func (app *Application) DrawPixel(
-	projectId uuid.UUID, color project.Color, coords project.Vector2,
-) error {
-	return app.remote.Publish(event.DrawPixelEvent{
-		ProjectId: projectId,
-		Color:     color,
-		Coords:    coords,
-	})
-}
-
-func (app *Application) Project(projectId uuid.UUID) (project.Project, error) {
-	return app.remote.Project(projectId)
-}
+// func (app *Application) DrawPixel(
+// 	projectId uuid.UUID, color project.Color, coords project.Vector2,
+// ) error {
+// 	return app.remote.Publish(event.UpdatePixelEvent{
+// 		ProjectId: projectId.String(),
+// 		Color:     color,
+// 		Coords:    coords,
+// 	})
+// }
+//
+// func (app *Application) Project(projectId uuid.UUID) (project.Project, error) {
+// 	return app.remote.Project(projectId)
+// }

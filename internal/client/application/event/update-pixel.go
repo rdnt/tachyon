@@ -5,14 +5,12 @@ import (
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
-const DrawPixel Type = "draw_pixel"
-
-type DrawPixelEvent struct {
+type UpdatePixelEvent struct {
 	ProjectId uuid.UUID
 	Color     project.Color
 	Coords    project.Vector2
 }
 
-func (DrawPixelEvent) Type() Type {
-	return DrawPixel
+func (UpdatePixelEvent) Type() Type {
+	return UpdatePixel
 }

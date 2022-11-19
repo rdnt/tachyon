@@ -24,7 +24,7 @@ func FromJSON(b []byte) (event.Event, error) {
 		return CreateUserEventFromJSON(b)
 	case event.CreateProject:
 		return CreateProjectEventFromJSON(b)
-	case event.DrawPixel:
+	case event.UpdatePixel:
 		return DrawPixelEventFromJSON(b)
 	default:
 		return nil, errors.New("invalid event type")

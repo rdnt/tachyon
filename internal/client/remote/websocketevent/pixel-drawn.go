@@ -16,7 +16,7 @@ type PixelDrawnEvent struct {
 
 func PixelDrawnEventToJSON(e event.PixelDrawnEvent) ([]byte, error) {
 	e2 := PixelDrawnEvent{
-		Event:     event.PixelDrawn.String(),
+		Event:     event.PixelUpdated.String(),
 		UserId:    e.UserId.String(),
 		ProjectId: e.ProjectId.String(),
 		Color:     e.Color.String(),

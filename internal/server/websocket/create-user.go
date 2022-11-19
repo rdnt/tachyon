@@ -1,27 +1,19 @@
 package websocket
 
 import (
-	wsevent "github.com/rdnt/tachyon/internal/server/websocket/event"
+	"github.com/rdnt/tachyon/internal/pkg/event"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
-func (s *Server) CreateUser(e wsevent.CreateUserEvent, c *Conn) error {
+func (s *Server) OnConnect(c *Conn) error {
 	uid := uuid.New()
 
-	err := s.commands.CreateUser(uid, e.Name)
+	err := s.commands.CreateUser(uid, uid.String())
 	if err != nil {
 		return err
 	}
 
 	c.Set("userId", uid.String())
 
-	//b, err := wsevent.UserCreatedEventToJSON(event.UserCreatedEvent{
-	//	UserId: uid,
-	//	Name:   e.Name,
-	//})
-	//if err != nil {
-	//	return err
-	//}
-
-	return nil
+	return c.WriteEvent(event.ConnectedEvent{UserId: uid.String()})
 }

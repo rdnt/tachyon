@@ -1,12 +1,11 @@
 package event
 
-type PixelUpdatedEvent struct {
-	UserId    string  `json:"userId"`
+type UpdatePixelEvent struct {
 	ProjectId string  `json:"projectId"`
 	Color     string  `json:"color"`
 	Coords    Vector2 `json:"coords"`
 }
 
-func (PixelUpdatedEvent) Type() Type {
-	return PixelUpdated
+func (e UpdatePixelEvent) Type() Type {
+	return UpdatePixel
 }

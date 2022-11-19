@@ -1,19 +1,23 @@
 package remote
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
-	"github.com/rdnt/tachyon/internal/client/application/event"
-	"github.com/rdnt/tachyon/internal/client/remote/websocketevent"
+	"github.com/rdnt/tachyon/internal/pkg/event"
 )
 
 type Remote struct {
 	address string
 	conn    *websocket.Conn
 	events  chan event.Event
+}
+
+type jsonEvent struct {
+	Type string `json:"type"`
 }
 
 func New(address string) (*Remote, error) {
@@ -42,9 +46,20 @@ func New(address string) (*Remote, error) {
 				continue
 			}
 
-			e, err := websocketevent.FromJSON(b)
+			fmt.Println("Unmarshal", string(b))
+
+			var tmp jsonEvent
+			err = json.Unmarshal(b, &tmp)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Println("invalid message format1")
+				continue
+			}
+
+			var e event.Event
+			// TODO: @rdnt can't do that. add marshal unmarshal switch to shared pkg
+			err = json.Unmarshal(b, &e)
+			if err != nil {
+				fmt.Println("invalid message format2", err)
 				continue
 			}
 
@@ -60,7 +75,20 @@ func (r *Remote) Publish(e event.Event) error {
 		return errors.New("connection not established")
 	}
 
-	b, err := websocketevent.ToJSON(e)
+	b, err := json.Marshal(e)
+	if err != nil {
+		return err
+	}
+
+	var tmp map[string]any
+	err = json.Unmarshal(b, &tmp)
+	if err != nil {
+		return err
+	}
+
+	tmp["type"] = e.Type()
+
+	b, err = json.Marshal(tmp)
 	if err != nil {
 		return err
 	}
@@ -79,4 +107,8 @@ func (r *Remote) handleEvent(e event.Event) {
 
 func (r *Remote) Events() chan event.Event {
 	return r.events
+}
+
+func (r *Remote) HandleConnectedEvent(e event.ConnectedEvent) {
+	fmt.Println("CONNECTED", e)
 }

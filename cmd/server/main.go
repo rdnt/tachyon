@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
+	"github.com/rdnt/tachyon/internal/pkg/redis/rediseventbus"
+	"github.com/rdnt/tachyon/internal/pkg/redis/rediseventstore"
 	"log"
 	"net/http"
 	"os"
@@ -16,7 +19,6 @@ import (
 	"github.com/rdnt/tachyon/internal/server/application/command/repository/user_repository"
 	"github.com/rdnt/tachyon/internal/server/application/query"
 	"github.com/rdnt/tachyon/internal/server/websocket"
-	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
 func main() {
@@ -31,9 +33,15 @@ func main() {
 		DB:       cfg.Redis.Database,
 	})
 
+	err = rdb.FlushDB(context.Background()).Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	redisClient := redisclient.New(rdb, cfg.Redis.StreamKey)
-	eventStore := eventstore.New(redisClient)
-	eventBus := eventbus.New(redisClient)
+
+	eventStore := rediseventstore.New(redisClient)
+	eventBus := rediseventbus.New(redisClient)
 
 	sessionRepo, err := session_repository.New(eventStore)
 	if err != nil {
@@ -80,26 +88,26 @@ func main() {
 		projectView,
 	)
 
-	uid := uuid.Nil
-	err = commands.CreateUser(uid, "user-1")
-	fmt.Println(err)
+	// uid := uuid.Nil
+	// err = commands.CreateUser(uid, "user-1")
+	// fmt.Println(err)
+	//
+	// pid := uuid.Nil
+	// err = commands.CreateProject(pid, "project-1", uid)
+	// fmt.Println(err)
 
-	pid := uuid.Nil
-	err = commands.CreateProject(pid, "project-1", uid)
-	fmt.Println(err)
-
-	//m := &model{
+	// m := &model{
 	//	commands:  commands,
 	//	queries:   queries,
 	//	projectId: pid,
-	//}
+	// }
 	//
-	//p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseAllMotion())
+	// p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseAllMotion())
 	//
-	//err = p.Start()
-	//if err != nil {
+	// err = p.Start()
+	// if err != nil {
 	//	log.Fatal(err)
-	//}
+	// }
 
 	s := websocket.New(commands, queries)
 

@@ -4,8 +4,8 @@ package event
 
 type Event interface {
 	Type() Type
-	AggregateType() AggregateType
-	AggregateId() string
+	// AggregateType() AggregateType
+	// AggregateId() string
 }
 
 type AggregateType string
@@ -19,10 +19,19 @@ const (
 type Type string
 
 const (
-	UserCreated    Type = "user-created"
-	ProjectCreated Type = "project-created"
+	Connected Type = "connected"
+
+	CreateSession  Type = "create-session"
 	SessionCreated Type = "session-created"
-	JoinedSession  Type = "joined-session"
-	LeftSession    Type = "left-session"
-	PixelUpdated   Type = "pixel-updated"
+
+	JoinSession   Type = "join-session"
+	JoinedSession Type = "joined-session"
+
+	LeaveSession Type = "leave-session"
+	LeftSession  Type = "left-session"
+
+	ProjectCreated Type = "project-created"
+
+	UpdatePixel  Type = "pixel-updated"
+	PixelUpdated Type = "pixel-updated"
 )

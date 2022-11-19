@@ -35,8 +35,8 @@ func (r *Client) Publish(e event.Event) error {
 		ID:     "*",
 		Values: map[string]interface{}{
 			"type": e.Type().String(),
-			//"aggregateType": string(e.AggregateType()),
-			//"aggregateId":   e.AggregateId().String(),
+			// "aggregateType": string(e.AggregateType()),
+			// "aggregateId":   e.AggregateId().String(),
 			"event": string(b),
 		},
 	}).Err()

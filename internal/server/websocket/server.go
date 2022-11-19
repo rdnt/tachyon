@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/rdnt/tachyon/internal/pkg/event"
 	"net/http"
 	"sync"
 
@@ -62,6 +63,31 @@ func (c *Conn) Write(b []byte) error {
 	return c.conn.WriteMessage(websocket.TextMessage, b)
 }
 
+func (c *Conn) WriteEvent(e event.Event) error {
+	c.mux.Lock()
+	defer c.mux.Unlock()
+
+	b, err := json.Marshal(e)
+	if err != nil {
+		return err
+	}
+
+	var tmp map[string]any
+	err = json.Unmarshal(b, &tmp)
+	if err != nil {
+		return err
+	}
+
+	tmp["type"] = e.Type()
+
+	b, err = json.Marshal(tmp)
+	if err != nil {
+		return err
+	}
+
+	return c.conn.WriteMessage(websocket.TextMessage, b)
+}
+
 func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {
 	wsconn, err := s.upgrader.Upgrade(w, req, nil)
 	if err != nil {
@@ -77,6 +103,12 @@ func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {
 	conn := &Conn{
 		conn: wsconn,
 		ctx:  ctx,
+	}
+
+	err = s.HandleEvent(event.ConnectedEvent{UserId: "test"}, conn)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	for {
@@ -113,8 +145,11 @@ func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {
 
 func (s *Server) HandleEvent(e any, conn *Conn) error {
 	switch e := e.(type) {
-	case wsevent.CreateUserEvent:
-		return s.CreateUser(e, conn)
+	case event.ConnectedEvent:
+		return s.OnConnect(conn)
+
+	// case wsevent.CreateUserEvent:
+	// 	return s.CreateUser(e, conn)
 	case wsevent.CreateProjectEvent:
 		return s.CreateProject(e, conn)
 	case wsevent.DrawPixelEvent:

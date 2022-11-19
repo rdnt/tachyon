@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -11,7 +10,7 @@ import (
 )
 
 func main() {
-	r, err := remote.New("localhost:1967")
+	r, err := remote.New("ws://localhost:80/ws")
 	if err != nil {
 		panic(err)
 	}
@@ -21,11 +20,11 @@ func main() {
 		panic(err)
 	}
 
-	err = app.CreateUser("user-1")
-	fmt.Println(err)
-
-	err = app.CreateProject("project-1")
-	fmt.Println(err)
+	// err = app.CreateUser("user-1")
+	// fmt.Println(err)
+	//
+	// err = app.CreateProject("project-1")
+	// fmt.Println(err)
 
 	m := &model{
 		app:       app,

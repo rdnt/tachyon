@@ -1,14 +1,10 @@
 package main
 
 import (
-	"fmt"
-	"strings"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	gookitcolor "github.com/gookit/color"
 	"github.com/rdnt/tachyon/internal/client/application"
-	"github.com/rdnt/tachyon/internal/client/application/domain/project"
 	"github.com/rdnt/tachyon/pkg/uuid"
 )
 
@@ -36,18 +32,18 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.MouseMsg:
 		switch msg.Type {
 		case tea.MouseLeft:
-			err := m.app.DrawPixel(m.projectId,
-				project.Color{
-					R: 0xff, G: 0xff, B: 0xff, A: 0xff,
-				},
-				project.Vector2{
-					X: msg.X,
-					Y: msg.Y,
-				},
-			)
-			if err != nil {
-				panic(err)
-			}
+			// err := m.app.DrawPixel(m.projectId,
+			// 	project.Color{
+			// 		R: 0xff, G: 0xff, B: 0xff, A: 0xff,
+			// 	},
+			// 	project.Vector2{
+			// 		X: msg.X,
+			// 		Y: msg.Y,
+			// 	},
+			// )
+			// if err != nil {
+			// 	panic(err)
+			// }
 		}
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -63,33 +59,34 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	proj, err := m.app.Project(m.projectId)
-	if err != nil {
-		return ""
-	}
-
-	canvas := make([][]gookitcolor.RGBColor, m.height)
-	for i := range canvas {
-		canvas[i] = make([]gookitcolor.RGBColor, m.width)
-	}
-
-	for _, p := range proj.Pixels {
-		if p.Coords.Y >= m.height || p.Coords.X >= m.width || p.Coords.Y < 0 || p.Coords.X < 0 {
-			continue
-		}
-
-		canvas[p.Coords.Y][p.Coords.X] = gookitcolor.Hex(fmt.Sprintf("#%02x%02x%02x", p.Color.R, p.Color.G, p.Color.B), true)
-	}
-
-	var s strings.Builder
-	for _, row := range canvas {
-		for _, clr := range row {
-			s.WriteString(clr.Sprint(" "))
-		}
-		s.WriteString("\n")
-	}
-
-	return strings.TrimSuffix(s.String(), "\n")
+	return ""
+	// proj, err := m.app.Project(m.projectId)
+	// if err != nil {
+	// 	return ""
+	// }
+	//
+	// canvas := make([][]gookitcolor.RGBColor, m.height)
+	// for i := range canvas {
+	// 	canvas[i] = make([]gookitcolor.RGBColor, m.width)
+	// }
+	//
+	// for _, p := range proj.Pixels {
+	// 	if p.Coords.Y >= m.height || p.Coords.X >= m.width || p.Coords.Y < 0 || p.Coords.X < 0 {
+	// 		continue
+	// 	}
+	//
+	// 	canvas[p.Coords.Y][p.Coords.X] = gookitcolor.Hex(fmt.Sprintf("#%02x%02x%02x", p.Color.R, p.Color.G, p.Color.B), true)
+	// }
+	//
+	// var s strings.Builder
+	// for _, row := range canvas {
+	// 	for _, clr := range row {
+	// 		s.WriteString(clr.Sprint(" "))
+	// 	}
+	// 	s.WriteString("\n")
+	// }
+	//
+	// return strings.TrimSuffix(s.String(), "\n")
 }
 
 func tick() tea.Cmd {
