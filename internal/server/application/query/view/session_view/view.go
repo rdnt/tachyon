@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/rdnt/tachyon/internal/server/application/domain/session"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/domain/session"
+	"tachyon/pkg/uuid"
 )
 
 var ErrSessionNotFound = errors.New("session not found")

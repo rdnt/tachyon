@@ -1,8 +1,8 @@
 package websocket
 
 import (
-	wsevent "github.com/rdnt/tachyon/internal/server/websocket/event"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	wsevent "tachyon/internal/server/websocket/event"
+	"tachyon/pkg/uuid"
 )
 
 func (s *Server) CreateProject(e wsevent.CreateProjectEvent, c *Conn) error {

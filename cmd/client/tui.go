@@ -4,8 +4,8 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/rdnt/tachyon/internal/client/application"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/client/application"
+	"tachyon/pkg/uuid"
 )
 
 type model struct {

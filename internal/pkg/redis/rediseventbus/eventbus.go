@@ -1,8 +1,8 @@
 package rediseventbus
 
 import (
-	"github.com/rdnt/tachyon/internal/pkg/redis/redisclient"
-	"github.com/rdnt/tachyon/internal/server/application/event"
+	"tachyon/internal/pkg/redis/redisclient"
+	"tachyon/internal/server/application/event"
 )
 
 type EventBus struct {

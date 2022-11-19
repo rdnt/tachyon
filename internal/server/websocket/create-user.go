@@ -1,8 +1,8 @@
 package websocket
 
 import (
-	"github.com/rdnt/tachyon/internal/pkg/event"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/pkg/event"
+	"tachyon/pkg/uuid"
 )
 
 func (s *Server) OnConnect(c *Conn) error {

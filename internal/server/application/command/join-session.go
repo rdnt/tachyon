@@ -3,8 +3,8 @@ package command
 import (
 	"fmt"
 
-	"github.com/rdnt/tachyon/internal/server/application/event"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/event"
+	"tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 )
 

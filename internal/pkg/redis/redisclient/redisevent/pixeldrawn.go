@@ -3,9 +3,9 @@ package redisevent
 import (
 	"encoding/json"
 
-	"github.com/rdnt/tachyon/internal/server/application/domain/project"
-	"github.com/rdnt/tachyon/internal/server/application/event"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/domain/project"
+	"tachyon/internal/server/application/event"
+	"tachyon/pkg/uuid"
 )
 
 type PixelDrawnEvent struct {

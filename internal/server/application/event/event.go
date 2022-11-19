@@ -3,7 +3,7 @@ package event
 import (
 	"errors"
 
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 )
 

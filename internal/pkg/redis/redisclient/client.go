@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v9"
-	"github.com/rdnt/tachyon/internal/pkg/redis/redisclient/redisevent"
-	"github.com/rdnt/tachyon/internal/server/application/event"
+	"tachyon/internal/pkg/redis/redisclient/redisevent"
+	"tachyon/internal/server/application/event"
 )
 
 type Client struct {

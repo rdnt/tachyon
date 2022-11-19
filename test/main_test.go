@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/rdnt/tachyon/test/suite"
+	"tachyon/test/suite"
 	"gotest.tools/assert"
 )
 

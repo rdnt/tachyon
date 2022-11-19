@@ -3,8 +3,8 @@ package aggregate
 import (
 	"fmt"
 
-	"github.com/rdnt/tachyon/internal/client/application/domain/project"
-	"github.com/rdnt/tachyon/internal/pkg/event"
+	"tachyon/internal/client/application/domain/project"
+	"tachyon/internal/pkg/event"
 	"golang.org/x/exp/slices"
 )
 

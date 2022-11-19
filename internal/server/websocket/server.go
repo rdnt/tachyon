@@ -5,14 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/rdnt/tachyon/internal/pkg/event"
+	"tachyon/internal/pkg/event"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/websocket"
-	"github.com/rdnt/tachyon/internal/server/application/command"
-	"github.com/rdnt/tachyon/internal/server/application/query"
-	wsevent "github.com/rdnt/tachyon/internal/server/websocket/event"
+	"tachyon/internal/server/application/command"
+	"tachyon/internal/server/application/query"
+	wsevent "tachyon/internal/server/websocket/event"
 )
 
 type Server struct {

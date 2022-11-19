@@ -1,10 +1,10 @@
 package websocket
 
 import (
-	"github.com/rdnt/tachyon/internal/server/application/command"
-	"github.com/rdnt/tachyon/internal/server/application/domain/project"
-	wsevent "github.com/rdnt/tachyon/internal/server/websocket/event"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/command"
+	"tachyon/internal/server/application/domain/project"
+	wsevent "tachyon/internal/server/websocket/event"
+	"tachyon/pkg/uuid"
 )
 
 func (s *Server) DrawPixel(e wsevent.DrawPixelEvent, c *Conn) error {

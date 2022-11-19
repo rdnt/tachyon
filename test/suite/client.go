@@ -3,8 +3,8 @@ package suite
 import (
 	"testing"
 
-	"github.com/rdnt/tachyon/internal/client/application"
-	"github.com/rdnt/tachyon/internal/client/remote"
+	"tachyon/internal/client/application"
+	"tachyon/internal/client/remote"
 	"gotest.tools/assert"
 )
 

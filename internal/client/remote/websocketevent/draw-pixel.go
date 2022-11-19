@@ -3,9 +3,9 @@ package websocketevent
 import (
 	"encoding/json"
 
-	"github.com/rdnt/tachyon/internal/client/application/domain/project"
-	"github.com/rdnt/tachyon/internal/client/application/event"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/client/application/domain/project"
+	"tachyon/internal/client/application/event"
+	"tachyon/pkg/uuid"
 )
 
 type DrawPixelEvent struct {

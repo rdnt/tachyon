@@ -1,7 +1,7 @@
 package log
 
 import (
-	"github.com/rdnt/tachyon/pkg/logger"
+	"tachyon/pkg/logger"
 )
 
 var l = logger.New("", logger.Reset)

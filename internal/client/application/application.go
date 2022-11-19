@@ -2,9 +2,9 @@ package application
 
 import (
 	"fmt"
-	"github.com/rdnt/tachyon/internal/client/application/domain/project"
-	"github.com/rdnt/tachyon/internal/client/remote"
-	"github.com/rdnt/tachyon/internal/pkg/event"
+	"tachyon/internal/client/application/domain/project"
+	"tachyon/internal/client/remote"
+	"tachyon/internal/pkg/event"
 )
 
 type Application struct {

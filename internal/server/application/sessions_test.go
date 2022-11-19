@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/rdnt/tachyon/internal/server/application/query/view/session_view"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/query/view/session_view"
+	"tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 	"gotest.tools/assert"
 )

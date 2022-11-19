@@ -3,8 +3,8 @@ package redisevent
 import (
 	"encoding/json"
 
-	"github.com/rdnt/tachyon/internal/server/application/event"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/event"
+	"tachyon/pkg/uuid"
 )
 
 type SessionCreatedEvent struct {

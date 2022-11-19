@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/pkg/uuid"
 )
 
 type Project struct {

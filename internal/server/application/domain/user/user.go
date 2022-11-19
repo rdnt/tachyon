@@ -3,7 +3,7 @@ package user
 import (
 	"fmt"
 
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/pkg/uuid"
 )
 
 type User struct {

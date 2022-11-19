@@ -1,8 +1,8 @@
 package event
 
 import (
-	"github.com/rdnt/tachyon/internal/client/application/domain/project"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/client/application/domain/project"
+	"tachyon/pkg/uuid"
 )
 
 type UpdatePixelEvent struct {

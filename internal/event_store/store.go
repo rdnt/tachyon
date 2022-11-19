@@ -3,9 +3,9 @@ package event_store
 import (
 	"sync"
 
-	"github.com/rdnt/tachyon/internal/server/application/event"
-	"github.com/rdnt/tachyon/pkg/broker"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/event"
+	"tachyon/pkg/broker"
+	"tachyon/pkg/uuid"
 	"github.com/sanity-io/litter"
 )
 

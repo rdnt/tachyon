@@ -10,7 +10,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/rdnt/tachyon/pkg/syncwriter"
+	"tachyon/pkg/syncwriter"
 
 	"github.com/logrusorgru/aurora"
 	"github.com/mattn/go-colorable"

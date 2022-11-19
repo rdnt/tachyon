@@ -1,7 +1,7 @@
 package session
 
 import (
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/pkg/uuid"
 )
 
 type Session struct {

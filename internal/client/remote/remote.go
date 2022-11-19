@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/gorilla/websocket"
-	"github.com/rdnt/tachyon/internal/pkg/event"
+	"tachyon/internal/pkg/event"
 )
 
 type Remote struct {

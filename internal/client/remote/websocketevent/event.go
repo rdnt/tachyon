@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/rdnt/tachyon/internal/client/application/event"
+	"tachyon/internal/client/application/event"
 )
 
 type Event struct {

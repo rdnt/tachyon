@@ -4,9 +4,9 @@ import (
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/rdnt/tachyon/internal/client/application"
-	"github.com/rdnt/tachyon/internal/client/remote"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/client/application"
+	"tachyon/internal/client/remote"
+	"tachyon/pkg/uuid"
 )
 
 func main() {

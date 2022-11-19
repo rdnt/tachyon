@@ -1,8 +1,8 @@
 package application
 
 import (
-	"github.com/rdnt/tachyon/internal/server/application/domain/session"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/domain/session"
+	"tachyon/pkg/uuid"
 )
 
 type EventStore[E any] interface {

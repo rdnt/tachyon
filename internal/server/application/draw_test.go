@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/rdnt/tachyon/internal/server/application/command"
-	"github.com/rdnt/tachyon/internal/server/application/domain/project"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/command"
+	"tachyon/internal/server/application/domain/project"
+	"tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
 	"gotest.tools/assert"
 )

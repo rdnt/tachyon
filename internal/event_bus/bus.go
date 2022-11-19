@@ -3,8 +3,8 @@ package event_bus
 import (
 	"fmt"
 
-	"github.com/rdnt/tachyon/internal/server/application/event"
-	"github.com/rdnt/tachyon/pkg/fanout"
+	"tachyon/internal/server/application/event"
+	"tachyon/pkg/fanout"
 )
 
 type Bus struct {

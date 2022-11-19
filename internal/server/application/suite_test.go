@@ -4,12 +4,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rdnt/tachyon/internal/event_store"
-	"github.com/rdnt/tachyon/internal/server/application/command"
-	"github.com/rdnt/tachyon/internal/server/application/command/repository/project_repository"
-	"github.com/rdnt/tachyon/internal/server/application/command/repository/session_repository"
-	"github.com/rdnt/tachyon/internal/server/application/command/repository/user_repository"
-	"github.com/rdnt/tachyon/internal/server/application/query"
+	"tachyon/internal/event_store"
+	"tachyon/internal/server/application/command"
+	"tachyon/internal/server/application/command/repository/project_repository"
+	"tachyon/internal/server/application/command/repository/session_repository"
+	"tachyon/internal/server/application/command/repository/user_repository"
+	"tachyon/internal/server/application/query"
 	"gotest.tools/assert"
 )
 

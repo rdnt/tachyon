@@ -3,8 +3,8 @@ package aggregate
 import (
 	"fmt"
 
-	"github.com/rdnt/tachyon/internal/server/application/domain/user"
-	"github.com/rdnt/tachyon/internal/server/application/event"
+	"tachyon/internal/server/application/domain/user"
+	"tachyon/internal/server/application/event"
 )
 
 type User struct {

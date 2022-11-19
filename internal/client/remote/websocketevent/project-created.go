@@ -3,7 +3,7 @@ package websocketevent
 import (
 	"encoding/json"
 
-	"github.com/rdnt/tachyon/internal/client/application/event"
+	"tachyon/internal/client/application/event"
 )
 
 type ProjectCreatedEvent struct {

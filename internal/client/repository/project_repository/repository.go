@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rdnt/tachyon/internal/client/application/aggregate"
-	"github.com/rdnt/tachyon/internal/client/application/domain/project"
-	"github.com/rdnt/tachyon/internal/client/application/event"
-	"github.com/rdnt/tachyon/internal/server/application/command"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/client/application/aggregate"
+	"tachyon/internal/client/application/domain/project"
+	"tachyon/internal/client/application/event"
+	"tachyon/internal/server/application/command"
+	"tachyon/pkg/uuid"
 )
 
 type EventStore interface {

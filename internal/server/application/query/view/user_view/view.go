@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/rdnt/tachyon/internal/server/application/domain/user"
-	"github.com/rdnt/tachyon/pkg/uuid"
+	"tachyon/internal/server/application/domain/user"
+	"tachyon/pkg/uuid"
 )
 
 type View struct {
