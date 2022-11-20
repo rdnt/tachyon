@@ -13,13 +13,19 @@ import (
 type Remote struct {
 	address string
 	conn    *websocket.Conn
-	events  chan event.Event
+	events  chan Event
+}
+
+type Event interface {
+	Type() event.Type
+	AggregateType() event.AggregateType
+	AggregateId() string
 }
 
 func New(address string) (*Remote, error) {
 	r := &Remote{
 		address: address,
-		events:  make(chan event.Event),
+		events:  make(chan Event),
 	}
 
 	conn, _, err := websocket.DefaultDialer.Dial(address, nil)
@@ -42,7 +48,7 @@ func New(address string) (*Remote, error) {
 				continue
 			}
 
-			e, err := event.FromJSON(b)
+			e, err := EventFromJSON(b)
 			if err != nil {
 				fmt.Println("invalid message type", err)
 				continue
@@ -73,7 +79,7 @@ func (r *Remote) Publish(e event.Event) error {
 	return nil
 }
 
-func (r *Remote) Events() chan event.Event {
+func (r *Remote) Events() chan Event {
 	return r.events
 }
 

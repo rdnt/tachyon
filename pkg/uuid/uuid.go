@@ -22,6 +22,15 @@ func Parse(id string) (UUID, error) {
 	return UUID(uid), nil
 }
 
+func MustParse(id string) UUID {
+	uid, err := Parse(id)
+	if err != nil {
+		panic(err)
+	}
+
+	return uid
+}
+
 func New() UUID {
 	return UUID(uuid.New())
 }

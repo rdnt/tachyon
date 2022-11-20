@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v9"
+
 	"tachyon/internal/pkg/redis/redisclient/redisevent"
 	"tachyon/internal/server/application/event"
 )
@@ -114,7 +115,6 @@ func (r *Client) Events() ([]event.Event, error) {
 }
 
 func (r *Client) parseEvent(msg redis.XMessage) (event.Event, error) {
-	fmt.Println(msg)
 	val, ok := msg.Values["event"]
 	if !ok {
 		return nil, errors.New("event value does not exist")

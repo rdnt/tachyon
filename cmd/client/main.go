@@ -1,11 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+
 	"tachyon/internal/client/application"
 	"tachyon/internal/client/remote"
+	"tachyon/internal/client/repository/project_repository"
+	"tachyon/internal/client/repository/session_repository"
+	"tachyon/internal/client/repository/user_repository"
 	"tachyon/pkg/uuid"
 )
 
@@ -15,7 +24,22 @@ func main() {
 		panic(err)
 	}
 
-	app, err := application.New(r)
+	sessionRepo, err := session_repository.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	userRepo, err := user_repository.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	projectRepo, err := project_repository.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	app, err := application.New(r, sessionRepo, projectRepo, userRepo)
 	if err != nil {
 		panic(err)
 	}
@@ -28,13 +52,29 @@ func main() {
 
 	m := &model{
 		app:       app,
+		userId:    uuid.Nil,
 		projectId: uuid.Nil, // TODO: no need
 	}
 
 	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseAllMotion())
 
-	err = p.Start()
-	if err != nil {
-		log.Fatal(err)
-	}
+	_ = p
+	fmt.Println("client started")
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGHUP)
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			fmt.Println(projectRepo)
+			fmt.Println(sessionRepo)
+			fmt.Println(userRepo)
+			fmt.Println()
+		}
+	}()
+	<-stop
+
+	//err = p.Start()
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 }

@@ -4,23 +4,17 @@ import (
 	"fmt"
 	"sync"
 
+	"tachyon/internal/client/application"
 	"tachyon/internal/client/application/aggregate"
 	"tachyon/internal/client/application/domain/project"
-	"tachyon/internal/client/application/event"
-	"tachyon/internal/server/application/command"
+	"tachyon/internal/client/remote"
+	"tachyon/internal/pkg/event"
 	"tachyon/pkg/uuid"
 )
 
-type EventStore interface {
-	Events() ([]event.Event, error)
-	Subscribe(h func(e event.Event)) (dispose func(), err error)
-}
-
 type Repo struct {
-	store    EventStore
 	mux      sync.Mutex
 	projects map[uuid.UUID]*aggregate.Project
-	dispose  func()
 }
 
 func (r *Repo) Project(id uuid.UUID) (project.Project, error) {
@@ -29,7 +23,7 @@ func (r *Repo) Project(id uuid.UUID) (project.Project, error) {
 
 	p, ok := r.projects[id]
 	if !ok {
-		return project.Project{}, command.ErrProjectNotFound
+		return project.Project{}, application.ErrProjectNotFound
 	}
 
 	return p.Project, nil
@@ -39,7 +33,7 @@ func (r *Repo) String() string {
 	return fmt.Sprint(r.projects)
 }
 
-func (r *Repo) ProcessEvent(events ...event.Event) {
+func (r *Repo) ProcessEvents(events ...remote.Event) {
 	r.mux.Lock()
 
 	for _, e := range events {
@@ -47,38 +41,21 @@ func (r *Repo) ProcessEvent(events ...event.Event) {
 			continue
 		}
 
-		_, ok := r.projects[uuid.UUID(e.AggregateId())]
+		_, ok := r.projects[uuid.MustParse(e.AggregateId())]
 		if !ok {
-			r.projects[uuid.UUID(e.AggregateId())] = &aggregate.Project{}
+			r.projects[uuid.MustParse(e.AggregateId())] = &aggregate.Project{}
 		}
 
-		r.projects[uuid.UUID(e.AggregateId())].ProcessEvent(e)
+		r.projects[uuid.MustParse(e.AggregateId())].ProcessEvent(e)
 	}
 
 	r.mux.Unlock()
 }
 
-func New(store EventStore) (*Repo, error) {
+func New() (*Repo, error) {
 	r := &Repo{
-		store:    store,
 		projects: map[uuid.UUID]*aggregate.Project{},
 	}
-
-	events, err := store.Events()
-	if err != nil {
-		return nil, err
-	}
-
-	r.processEvents(events...)
-
-	dispose, err := store.Subscribe(func(e event.Event) {
-		r.processEvents(e)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	r.dispose = dispose
 
 	return r, nil
 }

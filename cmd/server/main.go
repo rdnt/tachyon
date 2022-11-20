@@ -118,6 +118,8 @@ func main() {
 		http.ListenAndServe(":80", nil)
 	}()
 
+	log.Println("server started")
+
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGHUP)
 

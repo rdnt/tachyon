@@ -74,6 +74,8 @@ func (c *Conn) WriteEvent(e event.Event) error {
 		return err
 	}
 
+	fmt.Println("send", string(b))
+
 	return c.conn.WriteMessage(websocket.TextMessage, b)
 }
 
