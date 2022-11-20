@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"tachyon/internal/pkg/event"
 	"net/http"
 	"sync"
 
+	"tachyon/internal/pkg/event"
+
 	"github.com/gorilla/websocket"
+
 	"tachyon/internal/server/application/command"
 	"tachyon/internal/server/application/query"
 	wsevent "tachyon/internal/server/websocket/event"
@@ -67,20 +69,7 @@ func (c *Conn) WriteEvent(e event.Event) error {
 	c.mux.Lock()
 	defer c.mux.Unlock()
 
-	b, err := json.Marshal(e)
-	if err != nil {
-		return err
-	}
-
-	var tmp map[string]any
-	err = json.Unmarshal(b, &tmp)
-	if err != nil {
-		return err
-	}
-
-	tmp["type"] = e.Type()
-
-	b, err = json.Marshal(tmp)
+	b, err := event.ToJSON(e)
 	if err != nil {
 		return err
 	}
@@ -105,7 +94,7 @@ func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {
 		ctx:  ctx,
 	}
 
-	err = s.HandleEvent(event.ConnectedEvent{UserId: "test"}, conn)
+	err = s.OnConnect(conn)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -145,9 +134,6 @@ func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {
 
 func (s *Server) HandleEvent(e any, conn *Conn) error {
 	switch e := e.(type) {
-	case event.ConnectedEvent:
-		return s.OnConnect(conn)
-
 	// case wsevent.CreateUserEvent:
 	// 	return s.CreateUser(e, conn)
 	case wsevent.CreateProjectEvent:

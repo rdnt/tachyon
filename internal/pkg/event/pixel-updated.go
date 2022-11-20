@@ -1,5 +1,7 @@
 package event
 
+import "encoding/json"
+
 type PixelUpdatedEvent struct {
 	UserId    string  `json:"userId"`
 	ProjectId string  `json:"projectId"`
@@ -17,4 +19,14 @@ func (e PixelUpdatedEvent) AggregateType() AggregateType {
 
 func (e PixelUpdatedEvent) AggregateId() string {
 	return e.ProjectId
+}
+
+func PixelUpdatedEventFromJSON(b []byte) (PixelUpdatedEvent, error) {
+	var e PixelUpdatedEvent
+	err := json.Unmarshal(b, &e)
+	if err != nil {
+		return PixelUpdatedEvent{}, err
+	}
+
+	return e, nil
 }
