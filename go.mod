@@ -8,12 +8,10 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v9 v9.0.0-rc.1
 	github.com/google/uuid v1.3.0
-	github.com/gookit/color v1.5.2
 	github.com/gorilla/websocket v1.5.0
 	github.com/lithammer/shortuuid/v3 v3.0.7
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/mattn/go-colorable v0.1.13
-	github.com/sanity-io/litter v1.5.5
 	golang.org/x/exp v0.0.0-20221006183845-316c7553db56
 	gotest.tools v2.2.0+incompatible
 )
@@ -35,9 +33,8 @@ require (
 	github.com/onsi/gomega v1.22.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64 // indirect
 	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/text v0.3.8 // indirect
 )
