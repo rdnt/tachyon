@@ -3,8 +3,9 @@ package test
 import (
 	"testing"
 
-	"tachyon/test/suite"
 	"gotest.tools/assert"
+
+	"tachyon/test/suite"
 )
 
 func TestIntegration(t *testing.T) {
