@@ -1,12 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 
@@ -19,7 +14,7 @@ import (
 )
 
 func main() {
-	r, err := remote.New("ws://localhost:80/ws")
+	r, err := remote.New("ws://0.0.0.0:8080/ws")
 	if err != nil {
 		panic(err)
 	}
@@ -58,23 +53,23 @@ func main() {
 
 	p := tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseAllMotion())
 
-	_ = p
-	fmt.Println("client started")
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGHUP)
-	go func() {
-		for {
-			time.Sleep(1 * time.Second)
-			fmt.Println(projectRepo)
-			fmt.Println(sessionRepo)
-			fmt.Println(userRepo)
-			fmt.Println()
-		}
-	}()
-	<-stop
+	//_ = p
+	//stop := make(chan os.Signal, 1)
+	//signal.Notify(stop, os.Interrupt, os.Kill, syscall.SIGTERM, syscall.SIGHUP)
+	//go func() {
+	//	for {
+	//		time.Sleep(1 * time.Second)
+	//		fmt.Println(projectRepo)
+	//		fmt.Println(sessionRepo)
+	//		fmt.Println(userRepo)
+	//		fmt.Println()
+	//	}
+	_, err = p.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	//err = p.Start()
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
+	//}()
+	//<-stop
+
 }

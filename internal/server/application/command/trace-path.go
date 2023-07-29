@@ -3,20 +3,23 @@ package command
 import (
 	"errors"
 
-	"tachyon/internal/server/application/domain/project"
+	"golang.org/x/exp/slices"
+
+	"tachyon/internal/server/application/domain/project/path"
 	"tachyon/internal/server/application/event"
 	"tachyon/pkg/uuid"
-	"golang.org/x/exp/slices"
 )
 
-type DrawPixelArgs struct {
+type TracePathArgs struct {
+	PathId    uuid.UUID
 	UserId    uuid.UUID
 	ProjectId uuid.UUID
-	Color     project.Color
-	Coords    project.Vector2
+	Tool      path.Tool
+	Color     path.Color
+	Point     path.Vector2
 }
 
-func (s *service) DrawPixel(args DrawPixelArgs) error {
+func (s *service) TracePath(args TracePathArgs) error {
 	proj, err := s.projects.Project(args.ProjectId)
 	if err != nil {
 		return err
@@ -39,11 +42,11 @@ func (s *service) DrawPixel(args DrawPixelArgs) error {
 		return errors.New("user doesn't have access to the project")
 	}
 
-	e := event.PixelDrawnEvent{
+	e := event.PathTracedEvent{
+		PathId:    args.PathId,
 		UserId:    args.UserId,
 		ProjectId: proj.Id,
-		Color:     args.Color,
-		Coords:    args.Coords,
+		Point:     args.Point,
 	}
 
 	err = s.publish(e)

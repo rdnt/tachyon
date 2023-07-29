@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	ProjectCreated Type = "project_created"
+	ProjectCreated Type = "project-created"
 )
 
 type ProjectCreatedEvent struct {

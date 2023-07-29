@@ -37,8 +37,11 @@ const (
 
 	ProjectCreated Type = "project-created"
 
-	UpdatePixel  Type = "pixel-updated"
-	PixelUpdated Type = "pixel-updated"
+	CreatePath  Type = "create-path"
+	PathCreated Type = "path-created"
+
+	TracePth   Type = "trace-path"
+	PathTraced Type = "path-traced"
 )
 
 //func MarshalJSON(e Event) ([]byte, error) {
@@ -97,8 +100,8 @@ func FromJSON(b []byte) (Event, error) {
 		return JoinedSessionEventFromJSON(b)
 	case LeftSession:
 		return LeftSessionEventFromJSON(b)
-	case PixelUpdated:
-		return PixelUpdatedEventFromJSON(b)
+	case PathCreated:
+		return PathCreatedEventFromJSON(b)
 	case ProjectCreated:
 		return ProjectCreatedEventFromJSON(b)
 	case SessionCreated:

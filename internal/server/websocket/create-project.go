@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"tachyon/internal/pkg/event"
 	wsevent "tachyon/internal/server/websocket/event"
 	"tachyon/pkg/uuid"
 )
@@ -18,14 +19,5 @@ func (s *Server) CreateProject(e wsevent.CreateProjectEvent, c *Conn) error {
 		return err
 	}
 
-	//b, err := wsevent.ProjectCreatedEventToJSON(wsevent.ProjectCreatedEvent{
-	//	ProjectId: pid.String(),
-	//	OwnerId:   uid.String(),
-	//	Name:      e.Name,
-	//})
-	//if err != nil {
-	//	return err
-	//}
-
-	return nil
+	return c.WriteEvent(event.ProjectCreatedEvent{ProjectId: pid.String()})
 }

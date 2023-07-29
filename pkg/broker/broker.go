@@ -21,7 +21,7 @@ func (o *Broker[E]) Subscribe(handler func(e E)) (dispose func()) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 
-	id := uuid.NewString()
+	id := uuid.New().String()
 	o.subscriptions[id] = handler
 
 	return func() {

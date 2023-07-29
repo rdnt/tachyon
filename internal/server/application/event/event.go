@@ -3,8 +3,9 @@ package event
 import (
 	"errors"
 
-	"tachyon/pkg/uuid"
 	"golang.org/x/exp/slices"
+
+	"tachyon/pkg/uuid"
 )
 
 //type Event interface {
@@ -86,6 +87,6 @@ var Types = []Type{
 	SessionCreated,
 	JoinedSession,
 	LeftSession,
-	PixelDrawn,
-	PixelErased,
+	PathCreated,
+	PathTraced,
 }

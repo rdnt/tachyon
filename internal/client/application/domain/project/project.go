@@ -13,12 +13,14 @@ type Project struct {
 	Id      uuid.UUID
 	Name    string
 	OwnerId uuid.UUID
-	Pixels  []Pixel
+	Paths   []Path
 }
 
-type Pixel struct {
+type Path struct {
+	Id     uuid.UUID
+	Tool   string
 	Color  Color
-	Coords Vector2
+	Points []Vector2
 }
 
 type Color color.RGBA
@@ -42,8 +44,8 @@ func ColorFromString(s string) (c Color, err error) {
 }
 
 type Vector2 struct {
-	X int
-	Y int
+	X float64
+	Y float64
 }
 
 func New(id uuid.UUID, ownerId uuid.UUID, name string) Project {

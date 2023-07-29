@@ -42,8 +42,8 @@ func EventFromJSON(b []byte) (Event, error) {
 		return event.JoinedSessionEventFromJSON(b)
 	case event.LeftSession:
 		return event.LeftSessionEventFromJSON(b)
-	case event.PixelUpdated:
-		return event.PixelUpdatedEventFromJSON(b)
+	case event.PathCreated:
+		return event.PathCreatedEventFromJSON(b)
 	case event.ProjectCreated:
 		return event.ProjectCreatedEventFromJSON(b)
 	case event.SessionCreated:

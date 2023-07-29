@@ -3,7 +3,6 @@ package application
 import (
 	"errors"
 
-	"tachyon/internal/client/application/aggregate"
 	"tachyon/internal/client/application/domain/project"
 	"tachyon/internal/client/application/domain/session"
 	"tachyon/internal/client/application/domain/user"
@@ -24,6 +23,7 @@ var ErrProjectNotFound = errors.New("project not found")
 
 type ProjectRepository interface {
 	Project(id uuid.UUID) (project.Project, error)
+	Projects() ([]project.Project, error)
 	ProcessEvents(events ...remote.Event)
 }
 
@@ -39,10 +39,6 @@ type Application struct {
 	sessions SessionRepository
 	projects ProjectRepository
 	users    UserRepository
-
-	session *aggregate.Session
-	project *aggregate.Project
-	user    *aggregate.User
 }
 
 func New(remote *remote.Remote, sessions SessionRepository, projects ProjectRepository, users UserRepository) (*Application, error) {
@@ -51,10 +47,6 @@ func New(remote *remote.Remote, sessions SessionRepository, projects ProjectRepo
 		sessions: sessions,
 		projects: projects,
 		users:    users,
-
-		project: &aggregate.Project{},
-		session: &aggregate.Session{},
-		user:    &aggregate.User{},
 	}
 
 	go func() {
@@ -89,19 +81,29 @@ func (app *Application) CreateSession(name string) error {
 	})
 }
 
+func (app *Application) Project() project.Project {
+	projs, err := app.projects.Projects()
+	if err != nil {
+		panic(err)
+	}
+
+	if len(projs) == 0 {
+		return project.Project{}
+	}
+
+	return projs[0]
+}
+
 func (app *Application) handleEvent(e remote.Event) error {
 	switch e.AggregateType() {
 	case event.User:
 		app.users.ProcessEvents(e)
-		app.user.ProcessEvent(e)
 		return nil
 	case event.Session:
 		app.sessions.ProcessEvents(e)
-		app.session.ProcessEvent(e)
 		return nil
 	case event.Project:
 		app.projects.ProcessEvents(e)
-		app.project.ProcessEvent(e)
 		return nil
 	default:
 		return errors.New("invalid aggregate type")
@@ -120,15 +122,20 @@ func (app *Application) handleEvent(e remote.Event) error {
 //
 //}
 
-// func (app *Application) DrawPixel(
-// 	projectId uuid.UUID, color project.Color, coords project.Vector2,
-// ) error {
-// 	return app.remote.Publish(event.UpdatePixelEvent{
-// 		ProjectId: projectId.String(),
-// 		Color:     color,
-// 		Coords:    coords,
-// 	})
-// }
+func (app *Application) CreatePath(
+	projectId uuid.UUID, color project.Color, point project.Vector2,
+) error {
+	return app.remote.Publish(event.CreatePathEvent{
+		ProjectId: projectId.String(),
+		Tool:      "pen",
+		Color:     color.String(),
+		Point: event.Vector2{
+			X: point.X,
+			Y: point.Y,
+		},
+	})
+}
+
 //
 // func (app *Application) Project(projectId uuid.UUID) (project.Project, error) {
 // 	return app.remote.Project(projectId)

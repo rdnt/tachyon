@@ -1,6 +1,6 @@
 package redisevent
 
-type IntVector2 struct {
-	X int `json:"x"`
-	Y int `json:"y"`
+type Vector2 struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }

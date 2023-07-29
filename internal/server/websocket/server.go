@@ -140,8 +140,8 @@ func (s *Server) HandleEvent(e any, conn *Conn) error {
 	// 	return s.CreateUser(e, conn)
 	case wsevent.CreateProjectEvent:
 		return s.CreateProject(e, conn)
-	case wsevent.DrawPixelEvent:
-		return s.DrawPixel(e, conn)
+	case wsevent.CreatePathEvent:
+		return s.CreatePath(e, conn)
 	default:
 		return errors.New("no event handler")
 	}

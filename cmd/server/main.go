@@ -89,13 +89,13 @@ func main() {
 		projectView,
 	)
 
-	// uid := uuid.Nil
-	// err = commands.CreateUser(uid, "user-1")
-	// fmt.Println(err)
+	//uid := uuid.Nil
+	//err = commands.CreateUser(uid, "user-1")
+	//fmt.Println(err)
 	//
-	// pid := uuid.Nil
-	// err = commands.CreateProject(pid, "project-1", uid)
-	// fmt.Println(err)
+	//pid := uuid.Nil
+	//err = commands.CreateProject(pid, "project-1", uid)
+	//fmt.Println(err)
 
 	// m := &model{
 	//	commands:  commands,
@@ -115,7 +115,7 @@ func main() {
 	http.HandleFunc("/ws", s.HandlerFunc)
 
 	go func() {
-		http.ListenAndServe(":80", nil)
+		http.ListenAndServe("0.0.0.0:8080", nil)
 	}()
 
 	log.Println("server started")

@@ -2,7 +2,7 @@ package event
 
 import "encoding/json"
 
-const CreateProject Type = "create_project"
+const CreateProject Type = "create-project"
 
 type CreateProjectEvent struct {
 	Event

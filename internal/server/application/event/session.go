@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	SessionCreated Type = "session_created"
-	JoinedSession  Type = "joined_session"
-	LeftSession    Type = "left_session"
+	SessionCreated Type = "session-created"
+	JoinedSession  Type = "joined-session"
+	LeftSession    Type = "left-session"
 )
 
 type SessionCreatedEvent struct {

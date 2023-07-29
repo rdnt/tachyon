@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	PathCreated Type = "path_created"
+	PathCreated Type = "path-created"
 )
 
 type PathCreatedEvent struct {

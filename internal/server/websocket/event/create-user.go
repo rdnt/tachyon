@@ -2,7 +2,7 @@ package event
 
 import "encoding/json"
 
-const CreateUser Type = "create_user"
+const CreateUser Type = "create-user"
 
 type CreateUserEvent struct {
 	Event

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
+	"tachyon/pkg/uuid"
 )
 
 type Path struct {
@@ -27,6 +27,10 @@ const (
 	Pen    Tool = "pen"
 	Eraser Tool = "eraser"
 )
+
+func (t Tool) String() string {
+	return string(t)
+}
 
 type Color color.RGBA
 

@@ -25,10 +25,10 @@ func EventToJSON(e event.Event) ([]byte, error) {
 		return JoinedSessionEventToJSON(e)
 	case event.LeftSessionEvent:
 		return LeftSessionEventToJSON(e)
-	case event.PixelDrawnEvent:
-		return PixelDrawnEventToJSON(e)
-	case event.PixelErasedEvent:
-		return PixelErasedEventToJSON(e)
+	case event.PathCreatedEvent:
+		return PathCreatedEventToJSON(e)
+	case event.PathTracedEvent:
+		return PathTracedEventToJSON(e)
 	default:
 		return nil, errors.New(fmt.Sprint("no event marshaler2", e))
 	}
@@ -46,10 +46,10 @@ func EventFromJSON(typ event.Type, b []byte) (event.Event, error) {
 		return JoinedSessionEventFromJSON(b)
 	case event.LeftSession:
 		return LeftSessionEventFromJSON(b)
-	case event.PixelDrawn:
-		return PixelDrawnEventFromJSON(b)
-	case event.PixelErased:
-		return PixelErasedEventFromJSON(b)
+	case event.PathCreated:
+		return PathCreatedEventFromJSON(b)
+	case event.PathTraced:
+		return PathTracedEventFromJSON(b)
 	default:
 		return nil, errors.New("invalid event type")
 	}

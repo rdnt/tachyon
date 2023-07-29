@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/samber/lo"
+
 	"tachyon/internal/client/application"
 	"tachyon/internal/client/application/aggregate"
 	"tachyon/internal/client/application/domain/project"
@@ -27,6 +29,15 @@ func (r *Repo) Project(id uuid.UUID) (project.Project, error) {
 	}
 
 	return p.Project, nil
+}
+
+func (r *Repo) Projects() ([]project.Project, error) {
+	r.mux.Lock()
+	defer r.mux.Unlock()
+
+	return lo.Map(lo.Values(r.projects), func(item *aggregate.Project, index int) project.Project {
+		return item.Project
+	}), nil
 }
 
 func (r *Repo) String() string {

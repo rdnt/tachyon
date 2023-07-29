@@ -48,9 +48,7 @@ type Service interface {
 	LeaveSession(id uuid.UUID, uid uuid.UUID) error
 
 	CreatePath(args CreatePathArgs) error
-
-	DrawPixel(args DrawPixelArgs) error
-	ErasePixel(args ErasePixelArgs) error
+	TracePath(args TracePathArgs) error
 }
 
 type service struct {

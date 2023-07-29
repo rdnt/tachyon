@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	UserCreated Type = "user_created"
+	UserCreated Type = "user-created"
 )
 
 type UserCreatedEvent struct {
