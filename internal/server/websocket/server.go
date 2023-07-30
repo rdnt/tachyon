@@ -5,12 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"sync"
-
-	"tachyon/internal/pkg/event"
-
 	"github.com/gorilla/websocket"
+	"net/http"
 
 	"tachyon/internal/server/application/command"
 	"tachyon/internal/server/application/query"
@@ -36,47 +32,6 @@ func New(commands command.Service, queries query.Service) *Server {
 			EnableCompression: false,
 		},
 	}
-}
-
-type Conn struct {
-	mux  sync.Mutex
-	conn *websocket.Conn
-	ctx  context.Context
-}
-
-func (c *Conn) Set(k string, v string) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	c.ctx = context.WithValue(c.ctx, k, v)
-}
-
-func (c *Conn) Get(k string) string {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	return c.ctx.Value(k).(string)
-}
-
-func (c *Conn) Write(b []byte) error {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	return c.conn.WriteMessage(websocket.TextMessage, b)
-}
-
-func (c *Conn) WriteEvent(e event.Event) error {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
-	b, err := event.ToJSON(e)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println("send", string(b))
-
-	return c.conn.WriteMessage(websocket.TextMessage, b)
 }
 
 func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {

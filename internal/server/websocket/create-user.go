@@ -16,18 +16,13 @@ func (s *Server) OnConnect(c *Conn) error {
 		return err
 	}
 
-	pid := uuid.New()
-	err = s.commands.CreateProject(pid, "project-1", uid)
-	if err != nil {
-		return err
-	}
+	// pid := uuid.New()
+	// err = s.commands.CreateProject(pid, "project-1", uid)
+	// if err != nil {
+	// 	return err
+	// }
 
-	c.Set("userId", uid.String())
+	c.userId = uid
 
-	err = c.WriteEvent(event.ConnectedEvent{UserId: uid.String()})
-	if err != nil {
-		return err
-	}
-
-	return c.WriteEvent(event.ProjectCreatedEvent{ProjectId: pid.String()})
+	return c.WriteEvent(event.ConnectedEvent{UserId: uid.String()})
 }

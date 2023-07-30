@@ -13,10 +13,12 @@ func (s *Server) CreateProject(e wsevent.CreateProjectEvent, c *Conn) error {
 	}
 
 	pid := uuid.New()
+	pid = uuid.MustParse("wUjYcKuM7TNXQoWeWmsQYF") // FIXME: remove
 
 	err = s.commands.CreateProject(pid, e.Name, uid)
 	if err != nil {
-		return err
+		// FIXME: HANDLE
+		// return err
 	}
 
 	return c.WriteEvent(event.ProjectCreatedEvent{ProjectId: pid.String()})

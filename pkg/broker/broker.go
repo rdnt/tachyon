@@ -3,46 +3,65 @@ package broker
 import (
 	"sync"
 
-	"github.com/google/uuid"
+	"tachyon/pkg/uuid"
 )
 
-type Broker[E any] struct {
+type Broker[C comparable, E any] struct {
 	lock          sync.Mutex
-	subscriptions map[string]func(E)
+	subscriptions map[C]map[uuid.UUID]func(E)
 }
 
-func New[E any]() *Broker[E] {
-	return &Broker[E]{
-		subscriptions: map[string]func(E){},
+func New[C comparable, E any]() *Broker[C, E] {
+	return &Broker[C, E]{
+		subscriptions: map[C]map[uuid.UUID]func(E){},
 	}
 }
 
-func (o *Broker[E]) Subscribe(handler func(e E)) (dispose func()) {
+func (o *Broker[C, E]) Subscribe(channel C, handler func(e E)) (dispose func()) {
+	id := uuid.New()
+
 	o.lock.Lock()
 	defer o.lock.Unlock()
 
-	id := uuid.New().String()
-	o.subscriptions[id] = handler
+	if _, ok := o.subscriptions[channel]; !ok {
+		o.subscriptions[channel] = map[uuid.UUID]func(E){}
+	}
+
+	o.subscriptions[channel][id] = handler
 
 	return func() {
-		o.dispose(id)
+		o.dispose(channel, id)
 	}
 }
 
-func (o *Broker[E]) Publish(e E) {
+func (o *Broker[C, E]) Publish(channel C, e E) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 
-	for _, h := range o.subscriptions {
-		if h != nil {
-			h(e)
+	for ch, subs := range o.subscriptions {
+		if ch != channel {
+			continue
+		}
+
+		for _, h := range subs {
+			if h != nil {
+				go func(h func(E)) {
+					// TODO: remove simulated network delay
+					// time.Sleep(10 * time.Millisecond)
+					h(e)
+				}(h)
+			}
 		}
 	}
 }
 
-func (o *Broker[E]) dispose(id string) {
+func (o *Broker[C, E]) dispose(channel C, id uuid.UUID) {
 	o.lock.Lock()
 	defer o.lock.Unlock()
 
-	delete(o.subscriptions, id)
+	if _, ok := o.subscriptions[channel]; !ok {
+		return
+	}
+
+	delete(o.subscriptions[channel], id)
 }

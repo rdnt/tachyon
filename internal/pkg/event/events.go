@@ -35,6 +35,7 @@ const (
 	LeaveSession Type = "leave-session"
 	LeftSession  Type = "left-session"
 
+	CreateProject  Type = "create-project"
 	ProjectCreated Type = "project-created"
 
 	CreatePath  Type = "create-path"
@@ -44,7 +45,7 @@ const (
 	PathTraced Type = "path-traced"
 )
 
-//func MarshalJSON(e Event) ([]byte, error) {
+// func MarshalJSON(e Event) ([]byte, error) {
 //	switch e := e.(type) {
 //	case event.UserCreatedEvent:
 //		return UserCreatedEventToJSON(e)
@@ -63,7 +64,7 @@ const (
 //	default:
 //		return nil, errors.New(fmt.Sprint("no event marshaler2", e))
 //	}
-//}
+// }
 
 type jsonEvent struct {
 	Event string `json:"event"`

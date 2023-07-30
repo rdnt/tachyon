@@ -2,7 +2,6 @@ package application
 
 import (
 	"errors"
-
 	"tachyon/internal/client/application/domain/project"
 	"tachyon/internal/client/application/domain/session"
 	"tachyon/internal/client/application/domain/user"
@@ -61,7 +60,7 @@ func New(remote *remote.Remote, sessions SessionRepository, projects ProjectRepo
 	return app, nil
 }
 
-//func (app *Application) handleConnectedEvent(e event.ConnectedEvent) error {
+// func (app *Application) handleConnectedEvent(e event.ConnectedEvent) error {
 //	//uid, err := uuid.Parse(e.UserId)
 //	//if err != nil {
 //	//	return err
@@ -73,7 +72,7 @@ func New(remote *remote.Remote, sessions SessionRepository, projects ProjectRepo
 //	//}
 //
 //	return nil
-//}
+// }
 
 func (app *Application) CreateSession(name string) error {
 	return app.remote.Publish(event.CreateSessionEvent{
@@ -108,19 +107,19 @@ func (app *Application) handleEvent(e remote.Event) error {
 	default:
 		return errors.New("invalid aggregate type")
 	}
-	//switch e := e.(type) {
-	//case event.ConnectedEvent:
+	// switch e := e.(type) {
+	// case event.ConnectedEvent:
 	//	return app.user.ProcessEvent(e)
-	//case event.SessionCreatedEvent:
+	// case event.SessionCreatedEvent:
 	//	return app.handleSessionCreatedEvent(e)
-	//default:
+	// default:
 	//	return errors.New("no event handler")
-	//}
+	// }
 }
 
-//func (app *Application) handleSessionCreatedEvent(e event.SessionCreatedEvent) error {
+// func (app *Application) handleSessionCreatedEvent(e event.SessionCreatedEvent) error {
 //
-//}
+// }
 
 func (app *Application) CreatePath(
 	projectId uuid.UUID, color project.Color, point project.Vector2,
@@ -136,7 +135,12 @@ func (app *Application) CreatePath(
 	})
 }
 
-//
+func (app *Application) CreateProject(name string) error {
+	return app.remote.Publish(event.CreateProjectEvent{
+		Name: name,
+	})
+}
+
 // func (app *Application) Project(projectId uuid.UUID) (project.Project, error) {
 // 	return app.remote.Project(projectId)
 // }

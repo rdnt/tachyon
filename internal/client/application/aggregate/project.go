@@ -19,10 +19,10 @@ func (p *Project) ProcessEvent(e event.Event) {
 	case event.ProjectCreatedEvent:
 		p.Project.Id = uuid.MustParse(e.ProjectId)
 	case event.PathCreatedEvent:
-		//idx := slices.IndexFunc(p.Pixels, func(pix project.Pixel) bool {
+		// idx := slices.IndexFunc(p.Pixels, func(pix project.Pixel) bool {
 		//	return pix.Coords.X == e.Coords.X && pix.Coords.Y == e.Coords.Y
-		//})
-		clr, err := path.ColorFromString("#ffffff")
+		// })
+		clr, err := path.ColorFromString("#ff0000")
 		if err != nil {
 			panic(err)
 		}
@@ -31,7 +31,7 @@ func (p *Project) ProcessEvent(e event.Event) {
 			Id:    uuid.MustParse(e.PathId),
 			Tool:  e.Tool,
 			Color: project.Color(clr),
-			//Color:  parseColor(e.Color),
+			// Color:  parseColor(e.Color),
 			Points: []project.Vector2{
 				{
 					X: e.Point.X,
@@ -39,7 +39,7 @@ func (p *Project) ProcessEvent(e event.Event) {
 				},
 			},
 		})
-	//case event.PixelErasedEvent:
+	// case event.PixelErasedEvent:
 	//	idx := slices.IndexFunc(p.Pixels, func(pix project.Pixel) bool {
 	//		return pix.Coords.X == e.Coords.X && pix.Coords.Y == e.Coords.Y
 	//	})

@@ -61,6 +61,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c":
 			return m, tea.Quit
+		case "p":
+			err := m.app.CreateProject("my-project")
+			if err != nil {
+				panic(err)
+			}
 		}
 
 	case time.Time:
@@ -112,15 +117,15 @@ func tick() tea.Cmd {
 	)
 }
 
-//var screen, _ = tcell.NewScreen()
+// var screen, _ = tcell.NewScreen()
 //
-//func init() {
+// func init() {
 //	if err := screen.Init(); err != nil {
 //		return
 //	}
-//}
+// }
 //
-//var resizeCmd = tea.Tick(time.Second/33, func(time.Time) tea.Msg {
+// var resizeCmd = tea.Tick(time.Second/33, func(time.Time) tea.Msg {
 //	//	screen, _ := tcell.NewScreen()
 //
 //	//	defer screen.Fini()
@@ -129,4 +134,4 @@ func tick() tea.Cmd {
 //		Width:  w,
 //		Height: h,
 //	}
-//})
+// })
