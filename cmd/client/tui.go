@@ -5,21 +5,18 @@ import (
 	"strings"
 	"time"
 
-	"tachyon/internal/client/application"
-	"tachyon/internal/client/application/domain/project"
-	"tachyon/pkg/uuid"
-
 	tea "github.com/charmbracelet/bubbletea"
 	gookitcolor "github.com/gookit/color"
+
+	"tachyon/internal/client/application"
+	"tachyon/internal/client/application/domain/project"
 )
 
 type model struct {
-	width     int
-	height    int
-	app       *application.Application
-	userId    uuid.UUID
-	projectId uuid.UUID
-	debug     string
+	width  int
+	height int
+	app    *application.Application
+	debug  string
 }
 
 func (m *model) Init() tea.Cmd {
@@ -41,31 +38,37 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case msg.Action == tea.MouseActionMotion && msg.Button == tea.MouseButtonLeft:
 			m.debug = fmt.Sprintf("%d   %d   %d   %d", m.width, m.height, msg.X, msg.Y)
 
-			proj := m.app.Project()
-
-			err := m.app.CreatePath(
-				proj.Id,
-				project.Color{
-					R: 0xff, G: 0xff, B: 0xff, A: 0xff,
-				},
-				project.Vector2{
-					X: float64(msg.X),
-					Y: float64(msg.Y),
-				},
-			)
-			if err != nil {
-				panic(err)
+			sess, err := m.app.Session()
+			if err == nil {
+				err := m.app.CreatePath(
+					sess.ProjectId,
+					project.Color{
+						R: 0xff, G: 0xff, B: 0xff, A: 0xff,
+					},
+					project.Vector2{
+						X: float64(msg.X),
+						Y: float64(msg.Y),
+					},
+				)
+				if err != nil {
+					panic(err)
+				}
 			}
 		}
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
 			return m, tea.Quit
-		case "p":
-			err := m.app.CreateProject("my-project")
+		case "c":
+			err := m.app.CreateSession("my-session")
 			if err != nil {
-				panic(err)
+				fmt.Println("@@@@ errrr", err)
 			}
+			// case "p":
+			// 	err := m.app.CreateProject("my-project")
+			// 	if err != nil {
+			// 		panic(err)
+			// 	}
 		}
 
 	case time.Time:
@@ -76,8 +79,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	proj := m.app.Project()
-	if proj.Id == uuid.Nil {
+	proj, err := m.app.Project()
+	if err != nil {
 		return ""
 	}
 

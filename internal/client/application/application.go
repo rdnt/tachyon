@@ -2,6 +2,8 @@ package application
 
 import (
 	"errors"
+	"time"
+
 	"tachyon/internal/client/application/domain/project"
 	"tachyon/internal/client/application/domain/session"
 	"tachyon/internal/client/application/domain/user"
@@ -14,14 +16,15 @@ import (
 var ErrSessionNotFound = errors.New("session not found")
 
 type SessionRepository interface {
-	Session(id uuid.UUID) (session.Session, error)
+	Session() (session.Session, error)
+	Sessions() ([]session.Session, error)
 	ProcessEvents(events ...remote.Event)
 }
 
 var ErrProjectNotFound = errors.New("project not found")
 
 type ProjectRepository interface {
-	Project(id uuid.UUID) (project.Project, error)
+	Project() (project.Project, error)
 	Projects() ([]project.Project, error)
 	ProcessEvents(events ...remote.Event)
 }
@@ -29,7 +32,8 @@ type ProjectRepository interface {
 var ErrUserNotFound = errors.New("user not found")
 
 type UserRepository interface {
-	User(id uuid.UUID) (user.User, error)
+	User() (user.User, error)
+	Users() ([]user.User, error)
 	ProcessEvents(events ...remote.Event)
 }
 
@@ -75,22 +79,32 @@ func New(remote *remote.Remote, sessions SessionRepository, projects ProjectRepo
 // }
 
 func (app *Application) CreateSession(name string) error {
+	err := app.remote.Publish(event.CreateProjectEvent{
+		Name: "my-project",
+	})
+	if err != nil {
+		return err
+	}
+
+	time.Sleep(10 * time.Millisecond)
+
+	proj, err := app.projects.Project()
+	if err != nil {
+		return err
+	}
+
 	return app.remote.Publish(event.CreateSessionEvent{
-		Name: name,
+		Name:      name,
+		ProjectId: proj.Id.String(),
 	})
 }
 
-func (app *Application) Project() project.Project {
-	projs, err := app.projects.Projects()
-	if err != nil {
-		panic(err)
-	}
+func (app *Application) Project() (project.Project, error) {
+	return app.projects.Project()
+}
 
-	if len(projs) == 0 {
-		return project.Project{}
-	}
-
-	return projs[0]
+func (app *Application) Session() (session.Session, error) {
+	return app.sessions.Session()
 }
 
 func (app *Application) handleEvent(e remote.Event) error {

@@ -15,6 +15,8 @@ func (s *service) CreateSession(
 		return err
 	}
 
+	// TODO: authorize user?
+
 	_, err = s.sessions.ProjectSessionByName(projectId, name)
 	if err == nil {
 		return errors.New("session already exists")

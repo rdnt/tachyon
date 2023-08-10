@@ -22,7 +22,7 @@ func (s *Server) OnConnect(c *Conn) error {
 	// 	return err
 	// }
 
-	c.userId = uid
+	c.id = uid
 
 	return c.WriteEvent(event.ConnectedEvent{UserId: uid.String()})
 }

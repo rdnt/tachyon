@@ -18,6 +18,7 @@ func (p *Project) ProcessEvent(e event.Event) {
 	switch e := e.(type) {
 	case event.ProjectCreatedEvent:
 		p.Project.Id = uuid.MustParse(e.ProjectId)
+		p.Project.Name = e.Name
 	case event.PathCreatedEvent:
 		// idx := slices.IndexFunc(p.Pixels, func(pix project.Pixel) bool {
 		//	return pix.Coords.X == e.Coords.X && pix.Coords.Y == e.Coords.Y

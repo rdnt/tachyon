@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/samber/lo"
+
 	"tachyon/internal/client/application"
 	"tachyon/internal/client/application/aggregate"
 	"tachyon/internal/client/application/domain/user"
@@ -13,20 +15,34 @@ import (
 )
 
 type Repo struct {
-	mux   sync.Mutex
-	users map[uuid.UUID]*aggregate.User
+	mux    sync.Mutex
+	users  map[uuid.UUID]*aggregate.User
+	userId uuid.UUID
 }
 
-func (r *Repo) User(id uuid.UUID) (user.User, error) {
+func (r *Repo) User() (user.User, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
-	u, ok := r.users[id]
+	if r.userId == uuid.Nil {
+		return user.User{}, application.ErrUserNotFound
+	}
+
+	u, ok := r.users[r.userId]
 	if !ok {
 		return user.User{}, application.ErrUserNotFound
 	}
 
 	return u.User, nil
+}
+
+func (r *Repo) Users() ([]user.User, error) {
+	r.mux.Lock()
+	defer r.mux.Unlock()
+
+	return lo.Map(lo.Values(r.users), func(item *aggregate.User, index int) user.User {
+		return item.User
+	}), nil
 }
 
 func (r *Repo) String() string {
@@ -47,6 +63,10 @@ func (r *Repo) ProcessEvents(events ...remote.Event) {
 		}
 
 		r.users[uuid.MustParse(e.AggregateId())].ProcessEvent(e)
+
+		if e.Type() == event.Connected {
+			r.userId = uuid.MustParse(e.AggregateId())
+		}
 	}
 
 	r.mux.Unlock()

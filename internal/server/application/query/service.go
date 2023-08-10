@@ -30,6 +30,7 @@ type ProjectView interface {
 
 type Service interface {
 	Session(id uuid.UUID) (session.Session, error)
+	//SessionUpdated(id uuid.UUID) (chan session.Session, error)
 	User(id uuid.UUID) (user.User, error)
 	Project(id uuid.UUID) (project.Project, error)
 }

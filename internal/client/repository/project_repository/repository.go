@@ -15,15 +15,20 @@ import (
 )
 
 type Repo struct {
-	mux      sync.Mutex
-	projects map[uuid.UUID]*aggregate.Project
+	mux       sync.Mutex
+	projects  map[uuid.UUID]*aggregate.Project
+	projectId uuid.UUID
 }
 
-func (r *Repo) Project(id uuid.UUID) (project.Project, error) {
+func (r *Repo) Project() (project.Project, error) {
 	r.mux.Lock()
 	defer r.mux.Unlock()
 
-	p, ok := r.projects[id]
+	if r.projectId == uuid.Nil {
+		return project.Project{}, application.ErrProjectNotFound
+	}
+
+	p, ok := r.projects[r.projectId]
 	if !ok {
 		return project.Project{}, application.ErrProjectNotFound
 	}
@@ -58,6 +63,10 @@ func (r *Repo) ProcessEvents(events ...remote.Event) {
 		}
 
 		r.projects[uuid.MustParse(e.AggregateId())].ProcessEvent(e)
+
+		if e.Type() == event.ProjectCreated {
+			r.projectId = uuid.MustParse(e.AggregateId())
+		}
 	}
 
 	r.mux.Unlock()

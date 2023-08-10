@@ -97,6 +97,12 @@ func FromJSON(b []byte) (Event, error) {
 	switch Type(tmp.Event) {
 	case Connected:
 		return ConnectedEventFromJSON(b)
+	case CreatePath:
+		return CreatePathEventFromJSON(b)
+	case CreateProject:
+		return CreateProjectEventFromJSON(b)
+	case CreateSession:
+		return CreateSessionEventFromJSON(b)
 	case JoinedSession:
 		return JoinedSessionEventFromJSON(b)
 	case LeftSession:

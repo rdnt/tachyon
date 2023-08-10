@@ -10,10 +10,11 @@ import (
 )
 
 type Conn struct {
-	mux  sync.Mutex
-	ctx  context.Context
-	conn *websocket.Conn
-	id   uuid.UUID
+	mux          sync.Mutex
+	ctx          context.Context
+	conn         *websocket.Conn
+	id           uuid.UUID
+	disposeFuncs []func()
 }
 
 func (c *Conn) Write(b []byte) error {
@@ -35,4 +36,12 @@ func (c *Conn) WriteEvent(e event.Event) error {
 	fmt.Println("send", string(b))
 
 	return c.conn.WriteMessage(websocket.TextMessage, b)
+}
+
+func (c *Conn) Close() error {
+	for _, dispose := range c.disposeFuncs {
+		dispose()
+	}
+
+	return c.conn.Close()
 }

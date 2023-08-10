@@ -4,15 +4,11 @@ import (
 	"tachyon/internal/pkg/event"
 	"tachyon/internal/server/application/command"
 	"tachyon/internal/server/application/domain/project/path"
-	wsevent "tachyon/internal/server/websocket/event"
 	"tachyon/pkg/uuid"
 )
 
-func (s *Server) CreatePath(e wsevent.CreatePathEvent, c *Conn) error {
-	uid, err := uuid.Parse(c.Get("userId"))
-	if err != nil {
-		return err
-	}
+func (s *Server) CreatePath(e event.CreatePathEvent, c *Conn) error {
+	uid := c.id
 
 	pid, err := uuid.Parse(e.ProjectId)
 	if err != nil {
@@ -44,7 +40,7 @@ func (s *Server) CreatePath(e wsevent.CreatePathEvent, c *Conn) error {
 		return err
 	}
 
-	return c.WriteEvent(event.PathCreatedEvent{
+	return s.Publish(pid, event.PathCreatedEvent{
 		PathId:    pathId.String(),
 		UserId:    uid.String(),
 		ProjectId: pid.String(),

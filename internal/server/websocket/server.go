@@ -2,21 +2,24 @@ package websocket
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"net/http"
 
+	"github.com/gorilla/websocket"
+
+	"tachyon/pkg/uuid"
+
+	"tachyon/internal/pkg/event"
 	"tachyon/internal/server/application/command"
 	"tachyon/internal/server/application/query"
-	wsevent "tachyon/internal/server/websocket/event"
 )
 
 type Server struct {
 	upgrader websocket.Upgrader
 	commands command.Service
 	queries  query.Service
+	hub      *Hub
 }
 
 func New(commands command.Service, queries query.Service) *Server {
@@ -31,6 +34,7 @@ func New(commands command.Service, queries query.Service) *Server {
 			},
 			EnableCompression: false,
 		},
+		hub: newHub(),
 	}
 }
 
@@ -68,14 +72,7 @@ func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {
 			continue
 		}
 
-		var evt wsevent.Event
-		err = json.Unmarshal(b, &evt)
-		if err != nil {
-			fmt.Println(err)
-			continue
-		}
-
-		e, err := wsevent.FromJSON(wsevent.Type(evt.Event), b)
+		e, err := event.FromJSON(b)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -91,13 +88,24 @@ func (s *Server) HandlerFunc(w http.ResponseWriter, req *http.Request) {
 
 func (s *Server) HandleEvent(e any, conn *Conn) error {
 	switch e := e.(type) {
-	// case wsevent.CreateUserEvent:
+	// case event.CreateUserEvent:
 	// 	return s.CreateUser(e, conn)
-	case wsevent.CreateProjectEvent:
+	case event.CreateProjectEvent:
 		return s.CreateProject(e, conn)
-	case wsevent.CreatePathEvent:
+	case event.CreateSessionEvent:
+		return s.CreateSession(e, conn)
+	case event.CreatePathEvent:
 		return s.CreatePath(e, conn)
 	default:
 		return errors.New("no event handler")
 	}
+}
+
+func (s *Server) Publish(topic uuid.UUID, e event.Event) error {
+	s.hub.Publish(topic, e)
+	return nil
+}
+
+func (s *Server) Subscribe(c *Conn, topic uuid.UUID) {
+	s.hub.Subscribe(c, topic)
 }

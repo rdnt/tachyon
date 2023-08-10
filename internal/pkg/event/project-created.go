@@ -4,6 +4,7 @@ import "encoding/json"
 
 type ProjectCreatedEvent struct {
 	ProjectId string `json:"projectId"`
+	Name      string `json:"name"`
 }
 
 func (e ProjectCreatedEvent) Type() Type {

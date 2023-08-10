@@ -1,1 +1,3 @@
-© 2022 Tasos Papalyras - All rights reserved.
+# tachyon
+ 
+experimenting with CQRS/ES by building a multiplayer terminal drawing app
