@@ -1,10 +1,9 @@
 package user_repository
 
 import (
-	"fmt"
+	"errors"
 	"sync"
 
-	"tachyon/internal/server/application/command"
 	"tachyon/internal/server/application/command/aggregate"
 	"tachyon/internal/server/application/domain/user"
 	"tachyon/internal/server/application/event"
@@ -12,16 +11,41 @@ import (
 )
 
 type EventStore interface {
-	Events() ([]event.Event, error)
+	//Events() ([]event.Event, error)
 	Subscribe(h func(e event.Event)) (dispose func(), err error)
 }
 
 type Repo struct {
-	store   EventStore
-	mux     sync.Mutex
-	users   map[uuid.UUID]*aggregate.User
-	dispose func()
+	store EventStore
+	mux   sync.Mutex
+	users map[uuid.UUID]*aggregate.User
 }
+
+func New(store EventStore) (*Repo, error) {
+	r := &Repo{
+		store: store,
+		users: map[uuid.UUID]*aggregate.User{},
+	}
+
+	return r, nil
+}
+
+func (r *Repo) ProcessEvents(events ...event.Event) {
+	r.mux.Lock()
+
+	for _, e := range events {
+		_, ok := r.users[e.AggregateId()]
+		if !ok {
+			r.users[e.AggregateId()] = &aggregate.User{}
+		}
+
+		r.users[e.AggregateId()].ProcessEvent(e)
+	}
+
+	r.mux.Unlock()
+}
+
+var ErrUserNotFound = errors.New("user not found")
 
 func (r *Repo) User(id uuid.UUID) (user.User, error) {
 	r.mux.Lock()
@@ -29,7 +53,7 @@ func (r *Repo) User(id uuid.UUID) (user.User, error) {
 
 	u, ok := r.users[id]
 	if !ok {
-		return user.User{}, command.ErrUserNotFound
+		return user.User{}, ErrUserNotFound
 	}
 
 	return u.User, nil
@@ -45,53 +69,5 @@ func (r *Repo) UserByName(name string) (user.User, error) {
 		}
 	}
 
-	return user.User{}, command.ErrUserNotFound
-}
-
-func (r *Repo) String() string {
-	return fmt.Sprint(r.users)
-}
-
-func (r *Repo) processEvents(events ...event.Event) {
-	r.mux.Lock()
-
-	for _, e := range events {
-		if e.AggregateType() != event.User {
-			continue
-		}
-
-		_, ok := r.users[uuid.UUID(e.AggregateId())]
-		if !ok {
-			r.users[uuid.UUID(e.AggregateId())] = &aggregate.User{}
-		}
-
-		r.users[uuid.UUID(e.AggregateId())].ProcessEvent(e)
-	}
-
-	r.mux.Unlock()
-}
-
-func New(store EventStore) (*Repo, error) {
-	r := &Repo{
-		store: store,
-		users: map[uuid.UUID]*aggregate.User{},
-	}
-
-	events, err := store.Events()
-	if err != nil {
-		return nil, err
-	}
-
-	r.processEvents(events...)
-
-	dispose, err := store.Subscribe(func(e event.Event) {
-		r.processEvents(e)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	r.dispose = dispose
-
-	return r, nil
+	return user.User{}, ErrUserNotFound
 }

@@ -8,6 +8,8 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/go-redis/redis/v9"
+	"gotest.tools/assert"
+
 	"tachyon/internal/pkg/redis/redisclient"
 	"tachyon/internal/pkg/redis/rediseventbus"
 	"tachyon/internal/pkg/redis/rediseventstore"
@@ -17,7 +19,6 @@ import (
 	"tachyon/internal/server/application/command/repository/user_repository"
 	"tachyon/internal/server/application/query"
 	"tachyon/internal/server/websocket"
-	"gotest.tools/assert"
 )
 
 type Server struct {
@@ -73,7 +74,7 @@ func NewServer(t *testing.T) *Server {
 	projectRepo, err := project_repository.New(eventStore)
 	assert.NilError(t, err)
 
-	commands := command.New(
+	commands := command.NewHandler(
 		eventStore,
 		eventBus,
 		sessionRepo,

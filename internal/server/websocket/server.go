@@ -17,12 +17,12 @@ import (
 
 type Server struct {
 	upgrader websocket.Upgrader
-	commands command.Service
-	queries  query.Service
+	commands *command.Commands
+	queries  *query.Queries
 	hub      *Hub
 }
 
-func New(commands command.Service, queries query.Service) *Server {
+func New(commands *command.Commands, queries *query.Queries) *Server {
 	return &Server{
 		commands: commands,
 		queries:  queries,

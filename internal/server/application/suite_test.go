@@ -4,14 +4,22 @@ import (
 	"testing"
 	"time"
 
-	"tachyon/internal/event_store"
+	"gotest.tools/assert"
+
 	"tachyon/internal/server/application/command"
 	"tachyon/internal/server/application/command/repository/project_repository"
 	"tachyon/internal/server/application/command/repository/session_repository"
 	"tachyon/internal/server/application/command/repository/user_repository"
+	"tachyon/internal/server/application/event"
+	"tachyon/internal/server/application/event_store"
 	"tachyon/internal/server/application/query"
-	"gotest.tools/assert"
 )
+
+type EventStore interface {
+	Publish(event event.Event) error
+	Subscribe(h func(e event.Event)) (dispose func(), err error)
+	Events() (events []event.Event, err error)
+}
 
 type suite struct {
 	bus         *event_store.Store
@@ -19,11 +27,11 @@ type suite struct {
 	sessionRepo *session_repository.Repo
 	userRepo    *user_repository.Repo
 	projectRepo *project_repository.Repo
-	commands    command.Service
+	commands    *command.Commands
 	sessionView *session_repository.Repo
 	userView    *user_repository.Repo
 	projectView *project_repository.Repo
-	queries     query.Service
+	queries     *query.Queries
 }
 
 func newSuite(t *testing.T) *suite {
@@ -39,13 +47,16 @@ func newSuite(t *testing.T) *suite {
 	projectRepo, err := project_repository.New(eventStore)
 	assert.NilError(t, err)
 
-	commands := command.New(
+	commandHandler := command.NewHandler(
 		eventStore,
 		eventBus,
 		sessionRepo,
 		projectRepo,
 		userRepo,
 	)
+
+	err = commandHandler.Start()
+	assert.NilError(t, err)
 
 	sessionView, err := session_repository.New(eventBus)
 	assert.NilError(t, err)
@@ -55,8 +66,8 @@ func newSuite(t *testing.T) *suite {
 
 	projectView, err := project_repository.New(eventBus)
 	assert.NilError(t, err)
-	//sessionView := session_view.New()
-	//userView := user_view.New()
+	//sessionView := session_view.NewHandler()
+	//userView := user_view.NewHandler()
 
 	queries := query.New(
 		eventBus,
@@ -65,13 +76,16 @@ func newSuite(t *testing.T) *suite {
 		projectView,
 	)
 
+	err = queries.Start()
+	assert.NilError(t, err)
+
 	return &suite{
 		bus:         eventBus,
 		store:       eventStore,
 		sessionRepo: sessionRepo,
 		userRepo:    userRepo,
 		projectRepo: projectRepo,
-		commands:    commands,
+		commands:    commandHandler,
 		sessionView: sessionView,
 		userView:    userView,
 		projectView: projectView,

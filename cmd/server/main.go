@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
 	"tachyon/internal/server/websocket"
 
 	"github.com/go-redis/redis/v9"
@@ -59,13 +60,18 @@ func main() {
 		log.Fatal(err)
 	}
 
-	commands := command.New(
+	commandHandler := command.NewHandler(
 		eventStore,
 		eventBus,
 		sessionRepo,
 		projectRepo,
 		userRepo,
 	)
+
+	err = commandHandler.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	sessionView, err := session_repository.New(eventBus)
 	if err != nil {
@@ -89,16 +95,21 @@ func main() {
 		projectView,
 	)
 
+	err = queries.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// uid := uuid.Nil
-	// err = commands.CreateUser(uid, "user-1")
+	// err = commandHandler.CreateUser(uid, "user-1")
 	// fmt.Println(err)
 	//
 	// pid := uuid.Nil
-	// err = commands.CreateProject(pid, "project-1", uid)
+	// err = commandHandler.CreateProject(pid, "project-1", uid)
 	// fmt.Println(err)
 
 	// m := &model{
-	//	commands:  commands,
+	//	commandHandler:  commandHandler,
 	//	queries:   queries,
 	//	projectId: pid,
 	// }
@@ -110,7 +121,7 @@ func main() {
 	//	log.Fatal(err)
 	// }
 
-	s := websocket.New(commands, queries)
+	s := websocket.New(commandHandler, queries)
 
 	http.HandleFunc("/ws", s.HandlerFunc)
 

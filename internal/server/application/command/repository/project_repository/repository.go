@@ -1,10 +1,9 @@
 package project_repository
 
 import (
-	"fmt"
+	"errors"
 	"sync"
 
-	"tachyon/internal/server/application/command"
 	"tachyon/internal/server/application/command/aggregate"
 	"tachyon/internal/server/application/domain/project"
 	"tachyon/internal/server/application/event"
@@ -20,8 +19,33 @@ type Repo struct {
 	store    EventStore
 	mux      sync.Mutex
 	projects map[uuid.UUID]*aggregate.Project
-	dispose  func()
 }
+
+func New(store EventStore) (*Repo, error) {
+	r := &Repo{
+		store:    store,
+		projects: map[uuid.UUID]*aggregate.Project{},
+	}
+
+	return r, nil
+}
+
+func (r *Repo) ProcessEvents(events ...event.Event) {
+	r.mux.Lock()
+
+	for _, e := range events {
+		_, ok := r.projects[e.AggregateId()]
+		if !ok {
+			r.projects[e.AggregateId()] = &aggregate.Project{}
+		}
+
+		r.projects[e.AggregateId()].ProcessEvent(e)
+	}
+
+	r.mux.Unlock()
+}
+
+var ErrProjectNotFound = errors.New("project not found")
 
 func (r *Repo) Project(id uuid.UUID) (project.Project, error) {
 	r.mux.Lock()
@@ -29,7 +53,7 @@ func (r *Repo) Project(id uuid.UUID) (project.Project, error) {
 
 	p, ok := r.projects[id]
 	if !ok {
-		return project.Project{}, command.ErrProjectNotFound
+		return project.Project{}, ErrProjectNotFound
 	}
 
 	return p.Project, nil
@@ -45,53 +69,5 @@ func (r *Repo) UserProjectByName(uid uuid.UUID, name string) (project.Project, e
 		}
 	}
 
-	return project.Project{}, command.ErrProjectNotFound
-}
-
-func (r *Repo) String() string {
-	return fmt.Sprint(r.projects)
-}
-
-func (r *Repo) processEvents(events ...event.Event) {
-	r.mux.Lock()
-
-	for _, e := range events {
-		if e.AggregateType() != event.Project {
-			continue
-		}
-
-		_, ok := r.projects[uuid.UUID(e.AggregateId())]
-		if !ok {
-			r.projects[uuid.UUID(e.AggregateId())] = &aggregate.Project{}
-		}
-
-		r.projects[uuid.UUID(e.AggregateId())].ProcessEvent(e)
-	}
-
-	r.mux.Unlock()
-}
-
-func New(store EventStore) (*Repo, error) {
-	r := &Repo{
-		store:    store,
-		projects: map[uuid.UUID]*aggregate.Project{},
-	}
-
-	events, err := store.Events()
-	if err != nil {
-		return nil, err
-	}
-
-	r.processEvents(events...)
-
-	dispose, err := store.Subscribe(func(e event.Event) {
-		r.processEvents(e)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	r.dispose = dispose
-
-	return r, nil
+	return project.Project{}, ErrProjectNotFound
 }

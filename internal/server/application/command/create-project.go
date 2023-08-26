@@ -3,11 +3,12 @@ package command
 import (
 	"errors"
 
+	"tachyon/internal/server/application/command/repository/project_repository"
 	"tachyon/internal/server/application/event"
 	"tachyon/pkg/uuid"
 )
 
-func (s *service) CreateProject(
+func (s *Commands) CreateProject(
 	id uuid.UUID, name string, ownerId uuid.UUID,
 ) error {
 	u, err := s.users.User(ownerId)
@@ -18,7 +19,7 @@ func (s *service) CreateProject(
 	_, err = s.projects.UserProjectByName(u.Id, name)
 	if err == nil {
 		return errors.New("project already exists")
-	} else if !errors.Is(err, ErrProjectNotFound) && err != nil {
+	} else if !errors.Is(err, project_repository.ErrProjectNotFound) && err != nil {
 		return err
 	}
 

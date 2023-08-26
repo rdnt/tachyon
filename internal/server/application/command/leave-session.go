@@ -3,12 +3,13 @@ package command
 import (
 	"fmt"
 
+	"golang.org/x/exp/slices"
+
 	"tachyon/internal/server/application/event"
 	"tachyon/pkg/uuid"
-	"golang.org/x/exp/slices"
 )
 
-func (s *service) LeaveSession(id uuid.UUID, uid uuid.UUID) error {
+func (s *Commands) LeaveSession(id uuid.UUID, uid uuid.UUID) error {
 	_, err := s.users.User(uid)
 	if err != nil {
 		return err

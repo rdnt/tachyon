@@ -64,11 +64,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				fmt.Println("@@@@ errrr", err)
 			}
-			// case "p":
-			// 	err := m.app.CreateProject("my-project")
-			// 	if err != nil {
-			// 		panic(err)
-			// 	}
+		case "p":
+			err := m.app.CreateProject("my-project")
+			if err != nil {
+				panic(err)
+			}
 		}
 
 	case time.Time:

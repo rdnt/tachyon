@@ -17,7 +17,7 @@ type CreatePathArgs struct {
 	Point     path.Vector2
 }
 
-func (s *service) CreatePath(args CreatePathArgs) error {
+func (s *Commands) CreatePath(args CreatePathArgs) error {
 	fmt.Println("CreatePath", args)
 	proj, err := s.projects.Project(args.ProjectId)
 	if err != nil {
@@ -39,7 +39,7 @@ func (s *service) CreatePath(args CreatePathArgs) error {
 	//}
 	//
 	//if !found && proj.OwnerId != args.UserId {
-	//	return errors.New("user doesn't have access to the project")
+	//	return errors.NewHandler("user doesn't have access to the project")
 	//}
 
 	e := event.PathCreatedEvent{

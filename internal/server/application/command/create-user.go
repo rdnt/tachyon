@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 
+	"tachyon/internal/server/application/command/repository/user_repository"
 	"tachyon/internal/server/application/event"
 	"tachyon/pkg/uuid"
 )
@@ -12,11 +13,11 @@ type CreateUserParams struct {
 	Name string
 }
 
-func (s *service) CreateUser(id uuid.UUID, name string) error {
+func (s *Commands) CreateUser(id uuid.UUID, name string) error {
 	_, err := s.users.UserByName(name)
 	if err == nil {
 		return errors.New("user already exists")
-	} else if !errors.Is(err, ErrUserNotFound) && err != nil {
+	} else if !errors.Is(err, user_repository.ErrUserNotFound) && err != nil {
 		return err
 	}
 

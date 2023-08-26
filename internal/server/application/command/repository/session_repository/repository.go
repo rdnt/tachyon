@@ -1,10 +1,9 @@
 package session_repository
 
 import (
-	"fmt"
+	"errors"
 	"sync"
 
-	"tachyon/internal/server/application/command"
 	"tachyon/internal/server/application/command/aggregate"
 	"tachyon/internal/server/application/domain/session"
 	"tachyon/internal/server/application/event"
@@ -20,8 +19,33 @@ type Repo struct {
 	store    EventStore
 	mux      sync.Mutex
 	sessions map[uuid.UUID]*aggregate.Session
-	dispose  func()
 }
+
+func New(store EventStore) (*Repo, error) {
+	r := &Repo{
+		store:    store,
+		sessions: map[uuid.UUID]*aggregate.Session{},
+	}
+
+	return r, nil
+}
+
+func (r *Repo) ProcessEvents(events ...event.Event) {
+	r.mux.Lock()
+
+	for _, e := range events {
+		_, ok := r.sessions[e.AggregateId()]
+		if !ok {
+			r.sessions[e.AggregateId()] = &aggregate.Session{}
+		}
+
+		r.sessions[e.AggregateId()].ProcessEvent(e)
+	}
+
+	r.mux.Unlock()
+}
+
+var ErrSessionNotFound = errors.New("session not found")
 
 func (r *Repo) Session(id uuid.UUID) (session.Session, error) {
 	r.mux.Lock()
@@ -29,7 +53,7 @@ func (r *Repo) Session(id uuid.UUID) (session.Session, error) {
 
 	s, ok := r.sessions[id]
 	if !ok {
-		return session.Session{}, command.ErrSessionNotFound
+		return session.Session{}, ErrSessionNotFound
 	}
 
 	return s.Session, nil
@@ -45,7 +69,7 @@ func (r *Repo) ProjectSessionByName(pid uuid.UUID, name string) (session.Session
 		}
 	}
 
-	return session.Session{}, command.ErrSessionNotFound
+	return session.Session{}, ErrSessionNotFound
 }
 
 func (r *Repo) ProjectSessions(pid uuid.UUID) ([]session.Session, error) {
@@ -60,52 +84,4 @@ func (r *Repo) ProjectSessions(pid uuid.UUID) ([]session.Session, error) {
 	}
 
 	return sessions, nil
-}
-
-func (r *Repo) String() string {
-	return fmt.Sprint(r.sessions)
-}
-
-func (r *Repo) processEvents(events ...event.Event) {
-	r.mux.Lock()
-
-	for _, e := range events {
-		if e.AggregateType() != event.Session {
-			continue
-		}
-
-		_, ok := r.sessions[uuid.UUID(e.AggregateId())]
-		if !ok {
-			r.sessions[uuid.UUID(e.AggregateId())] = &aggregate.Session{}
-		}
-
-		r.sessions[uuid.UUID(e.AggregateId())].ProcessEvent(e)
-	}
-
-	r.mux.Unlock()
-}
-
-func New(store EventStore) (*Repo, error) {
-	r := &Repo{
-		store:    store,
-		sessions: map[uuid.UUID]*aggregate.Session{},
-	}
-
-	events, err := store.Events()
-	if err != nil {
-		return nil, err
-	}
-
-	r.processEvents(events...)
-
-	dispose, err := store.Subscribe(func(e event.Event) {
-		r.processEvents(e)
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	r.dispose = dispose
-
-	return r, nil
 }

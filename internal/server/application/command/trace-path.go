@@ -19,7 +19,7 @@ type TracePathArgs struct {
 	Point     path.Vector2
 }
 
-func (s *service) TracePath(args TracePathArgs) error {
+func (s *Commands) TracePath(args TracePathArgs) error {
 	proj, err := s.projects.Project(args.ProjectId)
 	if err != nil {
 		return err

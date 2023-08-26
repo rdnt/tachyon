@@ -45,11 +45,7 @@ func (o *Broker[C, E]) Publish(channel C, e E) {
 
 		for _, h := range subs {
 			if h != nil {
-				go func(h func(E)) {
-					// TODO: remove simulated network delay
-					// time.Sleep(10 * time.Millisecond)
-					h(e)
-				}(h)
+				h(e)
 			}
 		}
 	}

@@ -4,9 +4,10 @@ import (
 	"errors"
 	"testing"
 
+	"gotest.tools/assert"
+
 	"tachyon/internal/server/application/query/view/session_view"
 	"tachyon/pkg/uuid"
-	"gotest.tools/assert"
 )
 
 func TestServer(t *testing.T) {
